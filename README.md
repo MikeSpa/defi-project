@@ -2,7 +2,7 @@
 
 - ERC20 Token `ProjectToken` 
 - FlashLoan contract 
-- Deposit to Aave 
+- Deposit and Withdraw to Aave 
 
 
 Trying a lot of stuff in DeFi: flash loan, farming, arbitrage, LP, trading, ...
@@ -30,4 +30,5 @@ Later join with futur NFT marketplace project
 
 ### Others
 - [ ] DAO
+- [ ] Make a front end at some point
 
