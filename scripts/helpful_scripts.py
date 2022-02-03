@@ -8,6 +8,8 @@ from web3 import Web3
 FORKED_LOCAL_ENVIRNOMENT = ["mainnet-fork", "mainnet-fork2"]
 LOCAL_BLOCKCHAIN_ENVIRONMENTS = ["development", "ganache-local", "hardhat"]
 
+CENT = Web3.toWei(100, "ether")
+
 
 def get_account(index=None, id=None):
     if index:

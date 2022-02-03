@@ -1,8 +1,6 @@
-from scripts.helpful_scripts import get_account
+from scripts.helpful_scripts import get_account, CENT
 from brownie import ProjectToken, network, config
 from web3 import Web3
-
-CENT = Web3.toWei(100, "ether")
 
 
 def deploy_token():
@@ -12,7 +10,7 @@ def deploy_token():
         {"from": account},
         publish_source=config["networks"][network.show_active()]["verify"],
     )
-    tx = token.transfer(token.address, token.totalSupply(), {"from": account})
+    tx = token.transfer(token.address, token.totalSupply() - CENT, {"from": account})
     tx.wait(1)
     return token
 

@@ -1,6 +1,7 @@
 from brownie import network, config, ProjectToken
 from scripts.helpful_scripts import (
     LOCAL_BLOCKCHAIN_ENVIRONMENTS,
+    CENT,
     get_account,
 )
 import pytest
@@ -18,5 +19,5 @@ def test_issue_tokens():
     starting_balance_account = token.balanceOf(account.address)
     starting_balance_contract = token.balanceOf(token.address)
 
-    assert starting_balance_contract == MM
-    assert starting_balance_account == 0
+    assert starting_balance_contract == MM - CENT
+    assert starting_balance_account == CENT
