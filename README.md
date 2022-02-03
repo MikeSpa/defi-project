@@ -6,8 +6,8 @@ Later join with futur NFT marketplace project
 
 
 ## TODO
-- [ ] Fix my internet
+- [x] Fix my internet
 - [ ] Add stuff to project token
-- [ ] Proper Flash Loan Contract
+- [x] Proper Flash Loan Contract
 - [ ] DAO
 
