@@ -22,6 +22,24 @@ def get_lending_pool():
     return lending_pool
 
 
+def deposit(lending_pool, token, amount, account):
+    print("#deposit")
+    deposit_tx = lending_pool.deposit(
+        token, amount, account.address, 0, {"from": account}
+    )
+    deposit_tx.wait(1)
+    print("Deposited")
+
+
+def withdraw(lending_pool, token, amount, account):
+    print("#withdraw")
+    withdraw_tx = lending_pool.withdraw(
+        token, amount, account.address, {"from": account}
+    )
+    withdraw_tx.wait(1)
+    print("Withdrawed")
+
+
 def main():
     print("## deposit_to_aave")
     account = get_account()
@@ -31,8 +49,6 @@ def main():
     lending_pool = get_lending_pool()
     approve_erc20(weth_address, lending_pool.address, AMOUNT, account)
     print("Depositing...")
-    deposit_tx = lending_pool.deposit(
-        weth_address, AMOUNT, account.address, 0, {"from": account}
-    )
-    deposit_tx.wait(1)
-    print("Deposited")
+    deposit(lending_pool, weth_address, AMOUNT, account)
+    print("Withdrawing...")
+    withdraw(lending_pool, weth_address, AMOUNT, account)
