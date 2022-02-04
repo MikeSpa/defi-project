@@ -17,16 +17,22 @@ Later join with futur NFT marketplace project
 - [x] Token: tests
 - [ ] Token: add functinality, burn/mint?
 
-### Flash Loan
-- [x] Proper Flash Loan Contract
-- [ ] Loan: deployment script
-- [ ] Loan: tests
+### Staking Contract
+- [ ] deploy script
+- [ ] test
+- [ ] add Aave deposit/withdraw
+- [ ] need minting/burning of project token
 
 ### Aave interaction
 
 - [ ] Add Aave interaction
 - [ ] Aave: deployment script
 - [ ] Aave: tests
+
+### Flash Loan
+- [x] Proper Flash Loan Contract
+- [ ] Loan: deployment script
+- [ ] Loan: tests
 
 ### Others
 - [ ] DAO
