@@ -5,7 +5,7 @@ from scripts.helpful_scripts import (
     get_account,
 )
 import pytest
-from scripts.deploy import deploy_token
+from scripts.deploy_token import deploy_token
 
 MM = 1_000_000_000_000_000_000_000_000
 
