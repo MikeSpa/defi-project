@@ -49,3 +49,16 @@ def approve_erc20(token_address, spender, amount, account):
     tx = erc20.approve(spender, amount, {"from": account})
     tx.wait(1)
     print("Approved")
+
+
+def get_asset_price(price_feed_address):
+    price_feed = interface.AggregatorV3Interface(price_feed_address)
+    latest_price = price_feed.latestRoundData()[1]
+    converted_latest_price = Web3.fromWei(latest_price, "ether")
+    print(f"The price is {converted_latest_price}")
+    return float(converted_latest_price)
+
+
+def main():
+    get_asset_price(config["networks"][network.show_active()]["dai_eth_price_feed"])
+    pass
