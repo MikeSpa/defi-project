@@ -66,15 +66,16 @@ contract_to_mock = {
 
 def get_contract(contract_name):
     """
-    This function will grab the contract addresses
-    from the brownie config if defined,
-    otherwise it will deploy a mock version of that
-    contract and return taht mock contract
+    This script will either:
+            - Get an address from the config
+            - Or deploy a mock to use for a network that doesn't have it
         Args:
-            contract_name (string)
+            contract_name (string): This is the name that is refered to in the
+            brownie config and 'contract_to_mock' variable.
         Returns:
             brownie.network.contract.ProjectContract: The most recently deployed
-            version of this contract.
+            Contract of the type specificed by the dictonary. This could be either
+            a mock or the 'real' contract on a live network.
     """
     print("#get_contract")
     contract_type = contract_to_mock[contract_name]
@@ -84,10 +85,15 @@ def get_contract(contract_name):
         contract = contract_type[-1]
 
     else:
-        contract_address = config["networks"][network.show_active()][contract_name]
-        contract = Contract.from_abi(
-            contract_type._name, contract_address, contract_type.abi
-        )
+        try:
+            contract_address = config["networks"][network.show_active()][contract_name]
+            contract = Contract.from_abi(
+                contract_type._name, contract_address, contract_type.abi
+            )
+        except KeyError:
+            print(
+                f"{network.show_active()} address not found, perhaps you should add it to the config or deploy mocks?"
+            )
     return contract
 
 
@@ -97,10 +103,19 @@ def deploy_mocks():
     print("### Deploying Mocks...")
     # MockV3Aggregator is a list of all MockV3Agg we've deployed
     if len(MockV3Aggregator) <= 0:
-        MockV3Aggregator.deploy(
-            8, Web3.toWei(123_456_000_000, "ether"), {"from": account}
+        mock_price_feed = MockV3Aggregator.deploy(
+            18, Web3.toWei(123_456_000_000, "ether"), {"from": account}
         )
-        print("MockV3Aggregator deployed")
+        print(f"MockV3Aggregator deployed to {mock_price_feed}")
+
+
+def get_verify_status():
+    verify = (
+        config["networks"][network.show_active()]["verify"]
+        if config["networks"][network.show_active()].get("verify")
+        else False
+    )
+    return verify
 
 
 def main():

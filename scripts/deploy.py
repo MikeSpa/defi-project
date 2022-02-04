@@ -1,4 +1,4 @@
-from scripts.helpful_scripts import get_account, CENT
+from scripts.helpful_scripts import get_account, CENT, get_verify_status
 from brownie import ProjectToken, network, config
 from web3 import Web3
 
@@ -8,7 +8,7 @@ def deploy_token():
     account = get_account()
     token = ProjectToken.deploy(
         {"from": account},
-        publish_source=config["networks"][network.show_active()]["verify"],
+        publish_source=get_verify_status(),
     )
     tx = token.transfer(token.address, token.totalSupply() - CENT, {"from": account})
     tx.wait(1)
