@@ -43,18 +43,23 @@ def add_allowed_tokens(staking_contract, dict_of_allowed_tokens, account):
 
 
 def stake_token(staking_contract, token_address, amt, account):
-    # balacne = token_address.balanceOf(account.address)
-    # print(balacne)
     token_address.approve(staking_contract, CENT, {"from": account})
     staking_contract.stakeTokens(amt, token_address, {"from": account})
-    # balacne = token_address.balanceOf(account.address)
-    # print(balacne)
-    # balacne = token_address.balanceOf(staking_contract.address)
-    # print(balacne)
 
 
 def unstake_token(staking_contract, token_address, account):
     staking_contract.unstakeTokens(token_address, {"from": account})
+
+
+def deploy_and_stake(amt=POINT_ONE):
+    account = get_account()
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+    ) = deploy_staking_contract_and_project_token()
+    stake_token(staking_contract, weth_token, amt, account)
+    return staking_contract, project_token, weth_token
 
 
 def main():

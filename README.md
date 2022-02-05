@@ -1,6 +1,7 @@
 # DeFi Project
 
-- ERC20 Token `ProjectToken` 
+- ERC20 Token `ProjectToken`
+- Staking contract
 - FlashLoan contract 
 - Deposit and Withdraw to Aave 
 
@@ -18,7 +19,7 @@ Later join with futur NFT marketplace project
 - [ ] Token: add functinality, burn/mint?
 
 ### Staking Contract
-- [ ] deploy script
+- [x] deploy script
 - [ ] test
 - [ ] add Aave deposit/withdraw
 - [ ] need minting/burning of project token

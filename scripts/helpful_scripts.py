@@ -6,6 +6,7 @@ from brownie import (
     MockV3Aggregator,
     Contract,
     MockWETH,
+    MockDAI,
 )
 from web3 import Web3
 
@@ -14,6 +15,9 @@ LOCAL_BLOCKCHAIN_ENVIRONMENTS = ["development", "ganache-local", "hardhat"]
 
 CENT = Web3.toWei(100, "ether")
 POINT_ONE = Web3.toWei(0.1, "ether")
+
+INITIAL_PRICE_FEED_VALUE = 123_456_000_000
+DECIMALS = 18
 
 
 def get_account(index=None, id=None):
@@ -72,6 +76,7 @@ contract_to_mock = {
     "dai_eth_price_feed": MockV3Aggregator,
     "weth_token": MockWETH,
     "eth_usd_price_feed": MockV3Aggregator,
+    "dai_usd_price_feed": MockDAI,
 }
 
 
@@ -114,11 +119,13 @@ def deploy_mocks():
     print("### Deploying Mocks...")
     if len(MockV3Aggregator) <= 0:
         mock_price_feed = MockV3Aggregator.deploy(
-            18, Web3.toWei(123_456_000_000, "ether"), {"from": account}
+            DECIMALS, INITIAL_PRICE_FEED_VALUE, {"from": account}
         )
         print(f"MockV3Aggregator deployed to {mock_price_feed}")
     mock_weth_token = MockWETH.deploy({"from": account})
     print(f"MockWETH deployed to {mock_weth_token.address}")
+    mock_dai_token = MockDAI.deploy({"from": account})
+    print(f"MockWETH deployed to {mock_dai_token.address}")
 
 
 def get_verify_status():
