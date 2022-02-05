@@ -125,7 +125,7 @@ def deploy_mocks():
     mock_weth_token = MockWETH.deploy({"from": account})
     print(f"MockWETH deployed to {mock_weth_token.address}")
     mock_dai_token = MockDAI.deploy({"from": account})
-    print(f"MockWETH deployed to {mock_dai_token.address}")
+    print(f"MockDAI deployed to {mock_dai_token.address}")
 
 
 def get_verify_status():

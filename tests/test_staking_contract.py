@@ -9,9 +9,13 @@ from scripts.helpful_scripts import (
 )
 import pytest
 from scripts.deploy_staking_contract import (
+    add_allowed_tokens,
     deploy_staking_contract_and_project_token,
     deploy_and_stake,
 )
+
+
+# setPriceFeedContract
 
 
 def test_set_price_feed_contract_revert_on_non_owner():
@@ -50,7 +54,7 @@ def test_set_price_feed_contract():
 
 # TODO test issue token
 
-
+# getTokenValue
 def test_get_token_value():
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
@@ -66,6 +70,7 @@ def test_get_token_value():
     )
 
 
+# addAllowedTokens
 def test_add_allowed_tokens():
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
@@ -84,6 +89,7 @@ def test_add_allowed_tokens():
         staking_contract.addAllowedTokens(project_token.address, {"from": non_owner})
 
 
+# tokenIsAllowed
 def test_token_is_allowed():
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
@@ -97,6 +103,9 @@ def test_token_is_allowed():
     assert staking_contract.tokenIsAllowed(project_token)
     assert staking_contract.tokenIsAllowed(weth_token.address)
     # assert not staking_contract.tokenIsAllowed(non_owner)
+
+
+# stakeTokens
 
 
 def test_stake_tokens(amount_staked):
@@ -150,6 +159,9 @@ def test_stake_tokens_fails_if_not_positive_amt(amount_staked):
         staking_contract.stakeTokens(0, weth_token.address, {"from": account})
 
 
+# unstakeTokens
+
+
 def test_unstake_tokens(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
@@ -169,3 +181,120 @@ def test_unstake_tokens(amount_staked):
     )
     assert staking_contract.stakingBalance(weth_token.address, account.address) == 0
     assert staking_contract.uniqueTokensStaked(account.address) == 0
+
+
+def test_unstake_token_empty_balance():
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("Only for local testing!")
+    account = get_account()
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+    ) = deploy_staking_contract_and_project_token()
+    with pytest.raises(exceptions.VirtualMachineError):
+
+        staking_contract.unstakeTokens(weth_token.address, {"from": account})
+
+
+# Ownable
+def test_transfer_ownership():
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+    ) = deploy_staking_contract_and_project_token()
+    owner = get_account()
+    non_owner = get_account(index=1)
+
+    with pytest.raises(exceptions.VirtualMachineError):
+        staking_contract.transferOwnership(ZERO_ADDRESS, {"from": owner})
+
+    staking_contract.transferOwnership(non_owner, {"from": owner})
+
+    with pytest.raises(exceptions.VirtualMachineError):
+        staking_contract.transferOwnership(non_owner, {"from": owner})
+
+
+## getUserSingleTokenValue
+
+
+def test_get_user_value_no_staking(amount_staked):
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("Only for local testing!")
+    account = get_account()
+    (
+        staking_contract,
+        dapp_token,
+        weth_token,
+    ) = deploy_staking_contract_and_project_token()
+
+    user_value = staking_contract.getUserSingleTokenValue(
+        account.address, weth_token.address
+    )
+    assert user_value == 0
+
+
+def test_get_user_value(amount_staked):
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("Only for local testing!")
+    account = get_account()
+    staking_contract, dapp_token, weth_token = deploy_and_stake(amount_staked)
+
+    user_value = staking_contract.getUserSingleTokenValue(
+        account.address, weth_token.address
+    )
+    assert user_value == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+
+
+## getUserTotalValue
+
+
+def test_get_user_total_value_revert_if_no_stake():
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("Only for local testing!")
+    account = get_account()
+    (
+        staking_contract,
+        dapp_token,
+        weth_token,
+    ) = deploy_staking_contract_and_project_token()
+
+    with pytest.raises(exceptions.VirtualMachineError):
+        staking_contract.getUserTotalValue(account.address)
+
+
+# def test_get_user_total_value_with_different_tokens(amount_staked):
+#     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+#         pytest.skip("Only for local testing!")
+#     account = get_account()
+#     (
+#         staking_contract,
+#         dapp_token,
+#         weth_token,
+#     ) = deploy_staking_contract_and_project_token()
+#     mock_dai_token = get_contract("dai_usd_price_feed")
+#     dict_of_allowed_tokens = {
+#         weth_token: get_contract("eth_usd_price_feed"),
+#         mock_dai_token: get_contract("dai_usd_price_feed"),
+#     }
+#     add_allowed_tokens(staking_contract, dict_of_allowed_tokens, account)
+#     print("dai toekn")
+#     print(mock_dai_token)
+#     print(get_contract("dai_usd_price_feed"))
+#     mock_dai_token.approve(staking_contract.address, amount_staked, {"from": account})
+#     staking_contract.stakeTokens(
+#         amount_staked, mock_dai_token.address, {"from": account}
+#     )
+#     user_value_weth = staking_contract.getUserSingleTokenValue(
+#         account.address, weth_token.address
+#     )
+
+#     user_value_dai = staking_contract.getUserSingleTokenValue(
+#         account.address, mock_dai_token.address
+#     )
+
+#     assert user_value_weth == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+#     assert user_value_dai == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+#     total_value = staking_contract.getUserTotalValue(account.address)
+#     assert total_value == amount_staked
