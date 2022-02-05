@@ -25,6 +25,8 @@ networks:
     weth_token: '0xd0a1e359811322d97991e03f863a0c30c2cf029c'
     lending_pool_addresses_provider : '0x88757f2f99175387aB4C6a4b3067c77A695b0349'
     dai_eth_price_feed: '0x22B58f1EbEDfCA50feF632bD73368b2FdA96D541'
+    weth_token: '0xd0a1e359811322d97991e03f863a0c30c2cf029c'
+    eth_usd_price_feed: '0x9326BFA02ADD2366b30bacB125260Af641031331'
 
 # wallets
 dotenv:

@@ -1,4 +1,12 @@
-from brownie import network, accounts, config, interface, MockV3Aggregator, Contract
+from brownie import (
+    network,
+    accounts,
+    config,
+    interface,
+    MockV3Aggregator,
+    Contract,
+    MockWETH,
+)
 from web3 import Web3
 
 FORKED_LOCAL_ENVIRNOMENT = ["mainnet-fork", "mainnet-fork2"]
@@ -61,6 +69,8 @@ def get_asset_price(price_feed_address):
 
 contract_to_mock = {
     "dai_eth_price_feed": MockV3Aggregator,
+    "weth_token": MockWETH,
+    "eth_usd_price_feed": MockV3Aggregator,
 }
 
 
@@ -107,6 +117,8 @@ def deploy_mocks():
             18, Web3.toWei(123_456_000_000, "ether"), {"from": account}
         )
         print(f"MockV3Aggregator deployed to {mock_price_feed}")
+    mock_weth_token = MockWETH.deploy({"from": account})
+    print(f"MockWETH deployed to {mock_weth_token.address}")
 
 
 def get_verify_status():
