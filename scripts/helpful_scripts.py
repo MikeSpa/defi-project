@@ -13,6 +13,7 @@ FORKED_LOCAL_ENVIRNOMENT = ["mainnet-fork", "mainnet-fork2"]
 LOCAL_BLOCKCHAIN_ENVIRONMENTS = ["development", "ganache-local", "hardhat"]
 
 CENT = Web3.toWei(100, "ether")
+POINT_ONE = Web3.toWei(0.1, "ether")
 
 
 def get_account(index=None, id=None):
@@ -111,7 +112,6 @@ def deploy_mocks():
     account = get_account()
     print(f"### The active netwok is {network.show_active()}")
     print("### Deploying Mocks...")
-    # MockV3Aggregator is a list of all MockV3Agg we've deployed
     if len(MockV3Aggregator) <= 0:
         mock_price_feed = MockV3Aggregator.deploy(
             18, Web3.toWei(123_456_000_000, "ether"), {"from": account}

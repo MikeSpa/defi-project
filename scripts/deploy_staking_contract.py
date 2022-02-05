@@ -1,4 +1,11 @@
-from scripts.helpful_scripts import get_account, get_contract, CENT, get_verify_status
+from scripts.helpful_scripts import (
+    get_account,
+    get_contract,
+    CENT,
+    POINT_ONE,
+    get_verify_status,
+    get_weth,
+)
 from brownie import ProjectToken, StakingContract, config, network
 
 
@@ -22,7 +29,7 @@ def deploy_staking_contract_and_project_token():
         weth_token: get_contract("eth_usd_price_feed"),
     }
     add_allowed_tokens(staking_contract, dict_of_allowed_tokens, account)
-    return staking_contract, project_token
+    return staking_contract, project_token, weth_token
 
 
 def add_allowed_tokens(staking_contract, dict_of_allowed_tokens, account):
@@ -35,5 +42,38 @@ def add_allowed_tokens(staking_contract, dict_of_allowed_tokens, account):
         set_tx.wait(1)
 
 
+def stake_token(staking_contract, token_address, amt, account):
+    # balacne = token_address.balanceOf(account.address)
+    # print(balacne)
+    token_address.approve(staking_contract, CENT, {"from": account})
+    staking_contract.stakeTokens(amt, token_address, {"from": account})
+    # balacne = token_address.balanceOf(account.address)
+    # print(balacne)
+    # balacne = token_address.balanceOf(staking_contract.address)
+    # print(balacne)
+
+
+def unstake_token(staking_contract, token_address, account):
+    staking_contract.unstakeTokens(token_address, {"from": account})
+
+
 def main():
-    deploy_staking_contract_and_project_token()
+    account = get_account()
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+    ) = deploy_staking_contract_and_project_token()
+    weth_token_address = get_contract("weth_token")
+    stake_token(staking_contract, weth_token_address, POINT_ONE, account)
+    balacne = weth_token_address.balanceOf(account.address)
+    print(balacne)
+    balacne = weth_token_address.balanceOf(staking_contract.address)
+    print(balacne)
+
+    unstake_token(staking_contract, weth_token_address, account)
+
+    balacne = weth_token_address.balanceOf(account.address)
+    print(balacne)
+    balacne = weth_token_address.balanceOf(staking_contract.address)
+    print(balacne)
