@@ -45,7 +45,7 @@ def add_allowed_tokens(staking_contract, pricefeed_of_token, account):
 
 
 def stake_and_approve_token(staking_contract, token_address, amt, account):
-    token_address.approve(staking_contract, CENT, {"from": account})
+    token_address.approve(staking_contract, amt, {"from": account})
     staking_contract.stakeTokens(amt, token_address, {"from": account})
 
 

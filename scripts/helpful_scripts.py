@@ -21,7 +21,6 @@ DECIMALS = 18
 
 
 def get_account(index=None, id=None):
-    print("#get_account")
     if index:
         return accounts[index]
     if id:
@@ -94,7 +93,6 @@ def get_contract(contract_name):
             Contract of the type specificed by the dictonary. This could be either
             a mock or the 'real' contract on a live network.
     """
-    print("#get_contract")
     contract_type = contract_to_mock[contract_name]
     if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         if len(contract_type) <= 0:

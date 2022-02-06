@@ -288,55 +288,52 @@ def test_get_user_total_value_revert_if_no_stake():
         staking_contract.getUserTotalValue(account.address)
 
 
-# def test_get_user_total_value_with_different_tokens(amount_staked):
-#     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
-#         pytest.skip("Only for local testing!")
-#     # deploy
-#     account = get_account()
-#     (
-#         staking_contract,
-#         project_token,
-#         weth_token,
-#     ) = deploy_staking_contract_and_project_token()
-#     # Add different token
-#     dai_token = get_contract("dai_token")
-#     pricefeed_of_token = {
-#         weth_token: get_contract("eth_usd_price_feed"),
-#         dai_token: get_contract("dai_usd_price_feed"),
-#         project_token: get_contract("dai_usd_price_feed"),
-#     }
-#     add_allowed_tokens(staking_contract, pricefeed_of_token, account)
-#     user_value_weth = staking_contract.getUserSingleTokenValue(
-#         account.address, weth_token.address
-#     )
-#     user_value_pjtk = staking_contract.getUserSingleTokenValue(
-#         account.address, project_token.address
-#     )
+def test_get_user_total_value_with_different_tokens(amount_staked):
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("Only for local testing!")
+    # deploy
+    account = get_account()
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+    ) = deploy_staking_contract_and_project_token()
 
-#     user_value_dai = staking_contract.getUserSingleTokenValue(
-#         account.address, dai_token.address
-#     )
-#     assert user_value_weth == 0
-#     assert user_value_dai == 0
-#     assert user_value_pjtk == 0
-#     stake_and_approve_token(staking_contract, weth_token, amount_staked, account)
-#     stake_and_approve_token(staking_contract, dai_token, amount_staked, account)
-#     stake_and_approve_token(staking_contract, project_token, amount_staked, account)
-#     total_value = staking_contract.getUserTotalValue(account.address)
-#     user_value_weth = staking_contract.getUserSingleTokenValue(
-#         account.address, weth_token.address
-#     )
-#     user_value_pjtk = staking_contract.getUserSingleTokenValue(
-#         account.address, project_token.address
-#     )
+    # Add different token (weth already added)
+    dai_token = get_contract("dai_token")
+    pricefeed_of_token = {
+        dai_token: get_contract("dai_usd_price_feed"),
+        project_token: get_contract("dai_usd_price_feed"),
+    }
+    add_allowed_tokens(staking_contract, pricefeed_of_token, account)
+    user_value_weth = staking_contract.getUserSingleTokenValue(
+        account.address, weth_token.address
+    )
+    assert user_value_weth == 0
+    # revert: No tokens staked!
+    with pytest.raises(exceptions.VirtualMachineError):
+        staking_contract.getUserTotalValue(account.address)
+    # Stake tokens
+    stake_and_approve_token(staking_contract, weth_token, amount_staked, account)
+    stake_and_approve_token(staking_contract, dai_token, amount_staked, account)
+    stake_and_approve_token(staking_contract, project_token, amount_staked, account)
+    # Get value
+    total_value = staking_contract.getUserTotalValue(account.address)
+    user_value_weth = staking_contract.getUserSingleTokenValue(
+        account.address, weth_token.address
+    )
+    user_value_pjtk = staking_contract.getUserSingleTokenValue(
+        account.address, project_token.address
+    )
 
-#     user_value_dai = staking_contract.getUserSingleTokenValue(
-#         account.address, dai_token.address
-#     )
+    user_value_dai = staking_contract.getUserSingleTokenValue(
+        account.address, dai_token.address
+    )
+    # print(staking_contract.allowedTokens(0))
+    # print(staking_contract.allowedTokens(1))
+    # print(staking_contract.allowedTokens(2))
+    assert user_value_weth == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+    assert user_value_dai == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+    assert user_value_pjtk == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
 
-#     assert user_value_weth == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
-#     assert user_value_dai == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
-#     assert user_value_pjtk == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
-
-#     assert total_value == user_value_pjtk + user_value_dai + user_value_weth
-#     assert total_value == 3 * amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+    assert total_value == user_value_weth + user_value_dai + user_value_pjtk
