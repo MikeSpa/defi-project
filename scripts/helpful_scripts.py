@@ -76,7 +76,8 @@ contract_to_mock = {
     "dai_eth_price_feed": MockV3Aggregator,
     "weth_token": MockWETH,
     "eth_usd_price_feed": MockV3Aggregator,
-    "dai_usd_price_feed": MockDAI,
+    "dai_usd_price_feed": MockV3Aggregator,
+    "dai_token": MockDAI,
 }
 
 
@@ -117,11 +118,10 @@ def deploy_mocks():
     account = get_account()
     print(f"### The active netwok is {network.show_active()}")
     print("### Deploying Mocks...")
-    if len(MockV3Aggregator) <= 0:
-        mock_price_feed = MockV3Aggregator.deploy(
-            DECIMALS, INITIAL_PRICE_FEED_VALUE, {"from": account}
-        )
-        print(f"MockV3Aggregator deployed to {mock_price_feed}")
+    mock_price_feed = MockV3Aggregator.deploy(
+        DECIMALS, INITIAL_PRICE_FEED_VALUE, {"from": account}
+    )
+    print(f"MockV3Aggregator deployed to {mock_price_feed}")
     mock_weth_token = MockWETH.deploy({"from": account})
     print(f"MockWETH deployed to {mock_weth_token.address}")
     mock_dai_token = MockDAI.deploy({"from": account})

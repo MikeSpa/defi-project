@@ -12,6 +12,7 @@ from scripts.deploy_staking_contract import (
     add_allowed_tokens,
     deploy_staking_contract_and_project_token,
     deploy_and_stake,
+    stake_and_approve_token,
 )
 
 
@@ -58,6 +59,7 @@ def test_set_price_feed_contract():
 def test_get_token_value():
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
+    account = get_account()
     (
         staking_contract,
         project_token,
@@ -65,6 +67,26 @@ def test_get_token_value():
     ) = deploy_staking_contract_and_project_token()
 
     assert staking_contract.getTokenValue(weth_token.address) == (
+        INITIAL_PRICE_FEED_VALUE,
+        DECIMALS,
+    )
+    dai_token = get_contract("dai_token")
+    # token not added to contract
+    with pytest.raises(exceptions.VirtualMachineError):
+        staking_contract.getTokenValue(dai_token.address)
+    pricefeed_of_token = {
+        dai_token: get_contract("dai_usd_price_feed"),
+    }
+    add_allowed_tokens(staking_contract, pricefeed_of_token, account)
+    assert staking_contract.getTokenValue(dai_token.address) == (
+        INITIAL_PRICE_FEED_VALUE,
+        DECIMALS,
+    )
+    pricefeed_of_token = {
+        project_token: get_contract("dai_usd_price_feed"),
+    }
+    add_allowed_tokens(staking_contract, pricefeed_of_token, account)
+    assert staking_contract.getTokenValue(project_token.address) == (
         INITIAL_PRICE_FEED_VALUE,
         DECIMALS,
     )
@@ -100,9 +122,11 @@ def test_token_is_allowed():
         project_token,
         weth_token,
     ) = deploy_staking_contract_and_project_token()
-    assert staking_contract.tokenIsAllowed(project_token)
     assert staking_contract.tokenIsAllowed(weth_token.address)
-    # assert not staking_contract.tokenIsAllowed(non_owner)
+    assert not staking_contract.tokenIsAllowed(project_token)
+    assert not staking_contract.tokenIsAllowed(non_owner)
+    staking_contract.addAllowedTokens(project_token.address, {"from": account})
+    assert staking_contract.tokenIsAllowed(project_token)
 
 
 # stakeTokens
@@ -225,7 +249,7 @@ def test_get_user_value_no_staking(amount_staked):
     account = get_account()
     (
         staking_contract,
-        dapp_token,
+        project_token,
         weth_token,
     ) = deploy_staking_contract_and_project_token()
 
@@ -239,7 +263,7 @@ def test_get_user_value(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
-    staking_contract, dapp_token, weth_token = deploy_and_stake(amount_staked)
+    staking_contract, project_token, weth_token = deploy_and_stake(amount_staked)
 
     user_value = staking_contract.getUserSingleTokenValue(
         account.address, weth_token.address
@@ -256,7 +280,7 @@ def test_get_user_total_value_revert_if_no_stake():
     account = get_account()
     (
         staking_contract,
-        dapp_token,
+        project_token,
         weth_token,
     ) = deploy_staking_contract_and_project_token()
 
@@ -267,34 +291,52 @@ def test_get_user_total_value_revert_if_no_stake():
 # def test_get_user_total_value_with_different_tokens(amount_staked):
 #     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
 #         pytest.skip("Only for local testing!")
+#     # deploy
 #     account = get_account()
 #     (
 #         staking_contract,
-#         dapp_token,
+#         project_token,
 #         weth_token,
 #     ) = deploy_staking_contract_and_project_token()
-#     mock_dai_token = get_contract("dai_usd_price_feed")
-#     dict_of_allowed_tokens = {
+#     # Add different token
+#     dai_token = get_contract("dai_token")
+#     pricefeed_of_token = {
 #         weth_token: get_contract("eth_usd_price_feed"),
-#         mock_dai_token: get_contract("dai_usd_price_feed"),
+#         dai_token: get_contract("dai_usd_price_feed"),
+#         project_token: get_contract("dai_usd_price_feed"),
 #     }
-#     add_allowed_tokens(staking_contract, dict_of_allowed_tokens, account)
-#     print("dai toekn")
-#     print(mock_dai_token)
-#     print(get_contract("dai_usd_price_feed"))
-#     mock_dai_token.approve(staking_contract.address, amount_staked, {"from": account})
-#     staking_contract.stakeTokens(
-#         amount_staked, mock_dai_token.address, {"from": account}
-#     )
+#     add_allowed_tokens(staking_contract, pricefeed_of_token, account)
 #     user_value_weth = staking_contract.getUserSingleTokenValue(
 #         account.address, weth_token.address
 #     )
+#     user_value_pjtk = staking_contract.getUserSingleTokenValue(
+#         account.address, project_token.address
+#     )
 
 #     user_value_dai = staking_contract.getUserSingleTokenValue(
-#         account.address, mock_dai_token.address
+#         account.address, dai_token.address
+#     )
+#     assert user_value_weth == 0
+#     assert user_value_dai == 0
+#     assert user_value_pjtk == 0
+#     stake_and_approve_token(staking_contract, weth_token, amount_staked, account)
+#     stake_and_approve_token(staking_contract, dai_token, amount_staked, account)
+#     stake_and_approve_token(staking_contract, project_token, amount_staked, account)
+#     total_value = staking_contract.getUserTotalValue(account.address)
+#     user_value_weth = staking_contract.getUserSingleTokenValue(
+#         account.address, weth_token.address
+#     )
+#     user_value_pjtk = staking_contract.getUserSingleTokenValue(
+#         account.address, project_token.address
+#     )
+
+#     user_value_dai = staking_contract.getUserSingleTokenValue(
+#         account.address, dai_token.address
 #     )
 
 #     assert user_value_weth == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
 #     assert user_value_dai == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
-#     total_value = staking_contract.getUserTotalValue(account.address)
-#     assert total_value == amount_staked
+#     assert user_value_pjtk == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+
+#     assert total_value == user_value_pjtk + user_value_dai + user_value_weth
+#     assert total_value == 3 * amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
