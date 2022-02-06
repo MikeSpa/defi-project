@@ -99,7 +99,14 @@ contract StakingContract is Ownable {
         require(balance > 0, "Staking balance already 0!");
         stakingBalance[_token][msg.sender] = 0;
         uniqueTokensStaked[msg.sender] = uniqueTokensStaked[msg.sender] - 1;
-        //TODO remove them from staker list
+        if (uniqueTokensStaked[msg.sender] == 0) {
+            for (uint256 i = 0; i < stakers.length; i++) {
+                if (stakers[i] == msg.sender) {
+                    stakers[i] = stakers[stakers.length - 1];
+                    stakers.pop();
+                }
+            }
+        }
         IERC20(_token).transfer(msg.sender, balance);
     }
 
@@ -116,7 +123,7 @@ contract StakingContract is Ownable {
     }
 
     // check if a token is stakable
-    function tokenIsAllowed(address _token) public returns (bool) {
+    function tokenIsAllowed(address _token) public view returns (bool) {
         for (uint256 i = 0; i < allowedTokens.length; i++) {
             if (allowedTokens[i] == _token) {
                 return true;
