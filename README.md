@@ -20,7 +20,7 @@ Later join with futur NFT marketplace project
 
 ### Staking Contract
 - [x] deploy script
-- [ ] test
+- [x] test
 - [ ] add Aave deposit/withdraw
 - [ ] need minting/burning of project token
 
