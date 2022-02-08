@@ -30,10 +30,16 @@ Later join with futur NFT marketplace project
 - [ ] Aave: deployment script
 - [ ] Aave: tests
 
+### Compound interaction
+
+- [ ] Add Compound interaction
+- [ ] deployment script
+- [ ] tests
+
 ### Flash Loan
 - [x] Proper Flash Loan Contract
-- [ ] Loan: deployment script
-- [ ] Loan: tests
+- [x] Loan: deployment script
+- [x] Loan: tests
 
 ### Others
 - [ ] DAO
