@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
+// import "../interfaces/ILendingPool.sol";
+
 contract StakingContract is Ownable {
     IERC20 public projectToken;
     address[] public stakers;
@@ -14,9 +16,17 @@ contract StakingContract is Ownable {
     mapping(address => uint256) public uniqueTokensStaked;
     mapping(address => address) public tokenPriceFeedMapping;
 
-    constructor(address _projectTokenAddress) public {
+    // LendingPool pool;
+
+    constructor(address _projectTokenAddress, address _pool) public {
         projectToken = IERC20(_projectTokenAddress);
+        // pool = _pool;
     }
+
+    // // set the paddress for a new lending pool
+    // function setLendingPool(_pool) public onlyOwner {
+    //     pool = _pool;
+    // }
 
     // set the price feed address for a token
     function setPriceFeedContract(address _token, address _priceFeed)
