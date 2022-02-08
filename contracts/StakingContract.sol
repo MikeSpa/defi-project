@@ -40,7 +40,10 @@ contract StakingContract is Ownable {
     // get the total value stake for a given user
     function getUserTotalValue(address _user) public view returns (uint256) {
         uint256 totalValue = 0;
-        require(uniqueTokensStaked[_user] > 0, "No tokens staked!");
+        require(
+            uniqueTokensStaked[_user] > 0,
+            "StakingContract: No tokens staked!"
+        );
         //for any stakable token
         for (uint256 i = 0; i < allowedTokens.length; i++) {
             totalValue += getUserSingleTokenValue(_user, allowedTokens[i]);
@@ -80,8 +83,11 @@ contract StakingContract is Ownable {
 
     // stake a token
     function stakeTokens(uint256 _amount, address _token) public {
-        require(_amount > 0, "Amount must be greater than 0");
-        require(tokenIsAllowed(_token), "Token is currently no allowed");
+        require(_amount > 0, "StakingContract: Amount must be greater than 0");
+        require(
+            tokenIsAllowed(_token),
+            "StakingContract: Token is currently no allowed"
+        );
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
         updateUniqueTokensStaked(msg.sender, _token);
         stakingBalance[_token][msg.sender] =
@@ -96,7 +102,7 @@ contract StakingContract is Ownable {
     //unstake a token
     function unstakeTokens(address _token) public {
         uint256 balance = stakingBalance[_token][msg.sender];
-        require(balance > 0, "Staking balance already 0!");
+        require(balance > 0, "StakingContract: Staking balance already 0!");
         stakingBalance[_token][msg.sender] = 0;
         uniqueTokensStaked[msg.sender] = uniqueTokensStaked[msg.sender] - 1;
         if (uniqueTokensStaked[msg.sender] == 0) {
