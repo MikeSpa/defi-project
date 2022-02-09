@@ -1,4 +1,5 @@
-from brownie import CompoundInteractionContract, config, network
+from eth_account import Account
+from brownie import CompoundInteractionContract, config, network, interface
 from scripts.helpful_scripts import POINT_ONE, get_account, get_contract
 
 
@@ -22,10 +23,11 @@ def supplyEth(compound_int_con):
 def redeemEth(compound_int_con):
     account = get_account()
     cETH = config["networks"][network.show_active()]["cETH"]
-    account.transfer(compound_int_con.address, POINT_ONE / 10)
-    compound_int_con.redeemCEth(POINT_ONE, True, cETH, {"from": account})
+    account.transfer(compound_int_con.address, POINT_ONE / 100)
+    compound_int_con.redeemCEth(POINT_ONE, False, cETH, {"from": account})
     print(account.balance())
-    compound_int_con.drainAllFundscETH(cETH)
+    # compound_int_con.drainAllFundscETH(cETH) // redeem cETH if reddemCEth has arg == True
+    compound_int_con.drainAllFundsETH({"from": account})
     print(account.balance())
 
 
