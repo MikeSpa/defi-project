@@ -1,25 +1,27 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { DAppProvider, Kovan } from '@usedapp/core';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+    <DAppProvider config={{
+      networks: [Kovan],
+      notifications: { //notifications
+        expirationPeriod: 1000, //notif lasts 1sec
+        checkInterval: 1000 //check every second
+      }
+    }}>
+      <div>
         <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+          DeFi project
         </p>
         <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="https://github.com/MikeSpa/defi-project"
         >
-          Learn React
+          Project Github
         </a>
-      </header>
-    </div>
+      </div>
+    </DAppProvider>
+
   );
 }
 
