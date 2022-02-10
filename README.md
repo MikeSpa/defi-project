@@ -3,7 +3,7 @@
 - ERC20 Token `ProjectToken`
 - Staking contract
 - FlashLoan contract 
-- Deposit and Withdraw to Aave 
+- Deposit and Withdraw to Aave and Compound
 
 
 Trying a lot of stuff in DeFi: flash loan, farming, arbitrage, LP, trading, ...
