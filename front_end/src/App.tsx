@@ -1,5 +1,7 @@
 import React from 'react';
 import { DAppProvider, Kovan } from '@usedapp/core';
+import { Header } from "./components/Header";
+import { Header2 } from "./components/Header2";
 
 function App() {
   return (
@@ -10,6 +12,7 @@ function App() {
         checkInterval: 1000 //check every second
       }
     }}>
+      <Header />
       <div>
         <p>
           DeFi project
