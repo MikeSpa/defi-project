@@ -1,7 +1,7 @@
-import React from 'react';
 import { DAppProvider, Kovan } from '@usedapp/core';
 import { Header } from "./components/Header";
-import { Header2 } from "./components/Header2";
+import { Container } from "@material-ui/core"
+import { Main } from "./components/Main"
 
 function App() {
   return (
@@ -13,17 +13,10 @@ function App() {
       }
     }}>
       <Header />
-      <div>
-        <p>
-          DeFi project
-        </p>
-        <a
-          href="https://github.com/MikeSpa/defi-project"
-        >
-          Project Github
-        </a>
-      </div>
-    </DAppProvider>
+      <Container maxWidth="md">
+        <Main />
+      </Container>
+    </DAppProvider >
 
   );
 }
