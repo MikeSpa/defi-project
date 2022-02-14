@@ -1,4 +1,4 @@
-import { useEthers } from "@usedapp/core"
+import { useEthers, useLookupAddress } from "@usedapp/core"
 import {
     Button,
     makeStyles,
@@ -8,15 +8,8 @@ import {
 } from "@material-ui/core"
 
 const useStyles = makeStyles((theme) => ({
-    // container: {
-    //     padding: theme.spacing(4),
-    //     display: "flex",
-    //     justifyContent: "flex-end",
-    //     gap: theme.spacing(1),
-    // },
     header: {
         backgroundColor: "#400C88",
-        // width: "max-content"
     },
     logo: {
         fontFamily: "Work Sans, sans-serif",
@@ -62,7 +55,7 @@ const headersData = [
 export const Header = () => {
     const classes = useStyles()
     const { account, activateBrowserWallet, deactivate } = useEthers()
-
+    const ens = useLookupAddress()
     const isConnected = account !== undefined
 
     const displayDesktop = () => {
@@ -102,17 +95,21 @@ export const Header = () => {
 
     const getWallet = () => {
         return (
+            // Account
             <div className={classes.wallet}>
-                {isConnected ?//Acount connect/disconnect
+                {ens || account}
+                {isConnected ?
                     (<Button color="primary" variant="contained"
                         onClick={deactivate}>
                         Disconnect
+
                     </Button>) :
                     (<Button color="primary" variant="contained"
                         onClick={() => activateBrowserWallet()}>
                         Connect
                     </Button>)
                 }
+
             </div>
         )
     }
@@ -122,23 +119,5 @@ export const Header = () => {
             <AppBar className={classes.header}>{displayDesktop()}</AppBar>
         </header>
     );
-
-    // return (
-    //     <div className={classes.container}>
-    //         <div>
-
-    //             {isConnected ?//Acount connect/disconnect
-    //                 (<Button color="primary" variant="contained"
-    //                     onClick={deactivate}>
-    //                     Disconnect
-    //                 </Button>) :
-    //                 (<Button color="primary" variant="contained"
-    //                     onClick={() => activateBrowserWallet()}>
-    //                     Connect
-    //                 </Button>)
-    //             }
-    //         </div>
-    //     </div>
-    // )
 }
 
