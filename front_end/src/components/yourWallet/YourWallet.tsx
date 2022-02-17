@@ -4,6 +4,9 @@ import { TabContext, TabList, TabPanel } from "@material-ui/lab"
 import React, { useState } from "react"
 import { WalletBalance } from "./WalletBalance"
 import { StakeForm } from "./StakeForm"
+import { ConnectionRequiredMsg } from "../ConnectionRequiredMsg"
+import { useEthers } from "@usedapp/core"
+
 
 interface YourWalletProps {
     supportedTokens: Array<Token>
@@ -22,11 +25,13 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: "25px"
     },
     header: {
-        color: "white"
     }
 }))
 
 export const YourWallet = ({ supportedTokens }: YourWalletProps) => {
+
+    const { account } = useEthers()
+    const isConnected = account !== undefined
 
     const classes = useStyles()
 
@@ -37,30 +42,37 @@ export const YourWallet = ({ supportedTokens }: YourWalletProps) => {
     }
     return (
         <Box>
-            <h2 className={classes.header}> Your Wallet! </h2>
+            <h2 className={classes.header}>Your Wallet</h2>
             <Box className={classes.box}>
-                <TabContext value={selectedTokenIndex.toString()}>
-                    <TabList onChange={handleChange} aria-label="stake form tabs">
-                        {supportedTokens.map((token, index) => {
-                            return (
-                                <Tab label={token.name}
-                                    value={index.toString()}
-                                    key={index} />
-                            )
-                        })}
-                    </TabList>
-                    {supportedTokens.map((token, index) => {
-                        return (
-                            <TabPanel value={index.toString()} key={index}>
-                                <div className={classes.tabContent}>
-                                    <WalletBalance token={supportedTokens[selectedTokenIndex]} />
-                                    <StakeForm token={supportedTokens[selectedTokenIndex]} />
-                                </div>
-                            </TabPanel>
-                        )
-                    })
-                    }
-                </TabContext>
+                <div>
+                    {isConnected ? (
+                        <TabContext value={selectedTokenIndex.toString()}>
+                            <TabList onChange={handleChange} aria-label="stake form tabs">
+                                {supportedTokens.map((token, index) => {
+                                    return (
+                                        <Tab
+                                            label={token.name}
+                                            value={index.toString()}
+                                            key={index}
+                                        />
+                                    )
+                                })}
+                            </TabList>
+                            {supportedTokens.map((token, index) => {
+                                return (
+                                    <TabPanel value={index.toString()} key={index}>
+                                        <div className={classes.tabContent}>
+                                            <WalletBalance token={supportedTokens[selectedTokenIndex]} />
+                                            <StakeForm token={supportedTokens[selectedTokenIndex]} />
+                                        </div>
+                                    </TabPanel>
+                                )
+                            })}
+                        </TabContext>
+                    ) : (
+                        <ConnectionRequiredMsg />
+                    )}
+                </div>
             </Box>
         </Box>)
 }
