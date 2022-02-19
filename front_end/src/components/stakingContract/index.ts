@@ -1,0 +1,1 @@
+export { StakingContract } from "./StakingContract";

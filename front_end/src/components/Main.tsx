@@ -7,7 +7,14 @@ import pjtk from "../pjtk.png"
 import eth from "../eth.png"
 import dai from "../dai.png"
 import { YourWallet } from "./yourWallet/YourWallet"
-import { makeStyles } from "@material-ui/core"
+import { StakingContract } from "./stakingContract"
+import { Snackbar, Typography, makeStyles } from "@material-ui/core"
+import React, { useEffect, useState } from "react"
+import Alert from "@material-ui/lab/Alert"
+
+
+
+
 export type Token = {
     image: string
     address: string
@@ -15,7 +22,7 @@ export type Token = {
 }
 const useStyles = makeStyles((theme) => ({
     title: {
-        color: theme.palette.common.white,
+        // color: theme.palette.common.white,
         textAlign: "center",
         padding: theme.spacing(4)
     }
@@ -30,6 +37,7 @@ export const Main = () => {
     console.log(chainId)
     console.log(networkName)
 
+    // Our supported token
     const dappTokenAddress: string = chainId ? networkMapping[String(chainId)]["ProjectToken"][0] : constants.AddressZero
     const wethTokenAddress: string = chainId ? brownieConfig["networks"][networkName]["weth_token"] : constants.AddressZero
     const daiTokenAddress: string = chainId ? brownieConfig["networks"][networkName]["dai_token"] : constants.AddressZero
@@ -52,10 +60,54 @@ export const Main = () => {
         }
     ]
 
+    const [showNetworkError, setShowNetworkError] = useState(false)
 
+    const handleCloseNetworkError = (
+        event: React.SyntheticEvent | React.MouseEvent,
+        reason?: string
+    ) => {
+        if (reason === "clickaway") {
+            return
+        }
 
-    return (<>
-        <h1 className={classes.title}>Project Token</h1>
-        <YourWallet supportedTokens={supportedTokens} />
-    </>)
+        showNetworkError && setShowNetworkError(false)
+    }
+
+    /**
+     * useEthers will return a populated 'error' field when something has gone wrong.
+     * We can inspect the name of this error and conditionally show a notification
+     * that the user is connected to the wrong network.
+     */
+    useEffect(() => {
+        if (error && error.name === "UnsupportedChainIdError") {
+            !showNetworkError && setShowNetworkError(true)
+        } else {
+            showNetworkError && setShowNetworkError(false)
+        }
+    }, [error, showNetworkError])
+
+    return (
+        <>
+            <Typography
+                variant="h2"
+                component="h1"
+                classes={{
+                    root: classes.title,
+                }}
+            >
+                Staking
+            </Typography>
+            <YourWallet supportedTokens={supportedTokens} />
+            <StakingContract supportedTokens={supportedTokens} />
+            <Snackbar
+                open={showNetworkError}
+                autoHideDuration={5000}
+                onClose={handleCloseNetworkError}
+            >
+                <Alert onClose={handleCloseNetworkError} severity="warning">
+                    You need to be connected to the Kovan network!
+                </Alert>
+            </Snackbar>
+        </>
+    )
 }

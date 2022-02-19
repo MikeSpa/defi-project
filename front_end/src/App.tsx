@@ -13,6 +13,8 @@ function App() {
       }
     }}>
       <Header />
+      <br></br>
+      <br></br>
       <Container maxWidth="md">
         <Main />
       </Container>
