@@ -16,13 +16,13 @@ Later join with futur NFT marketplace project
 ### Token
 - [x] Token: deployment script
 - [x] Token: tests
-- [ ] Token: add functinality, burn/mint?
 
 ### Staking Contract
 - [x] deploy script
 - [x] test
-- [ ] add Aave deposit/withdraw
-- [ ] need minting/burning of project token
+- [x] add Aave deposit/withdraw
+- [ ] test       "
+- [ ] proxy to deposit on aave or compound, contract that take care of sending token x to one protocol and x to another
 
 ### Aave interaction
 

@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
-// import "../interfaces/ILendingPool.sol";
+import "../interfaces/ILendingPool.sol";
 
 contract StakingContract is Ownable {
     IERC20 public projectToken;
@@ -15,10 +15,11 @@ contract StakingContract is Ownable {
     //how many different erc20 token the user has currently staked
     mapping(address => uint256) public uniqueTokensStaked;
     mapping(address => address) public tokenPriceFeedMapping;
+    ILending Pool public pool;
 
     constructor(address _projectTokenAddress) public {
         projectToken = IERC20(_projectTokenAddress);
-        // pool = _pool;
+        pool = ILendingPool(_pool);
     }
 
     // set the price feed address for a token
@@ -100,6 +101,9 @@ contract StakingContract is Ownable {
         if (uniqueTokensStaked[msg.sender] == 1) {
             stakers.push(msg.sender);
         }
+
+        //deposit on aave
+        pool.deposit(_token, _amount, address(this), 0)
     }
 
     //unstake a token
@@ -116,7 +120,12 @@ contract StakingContract is Ownable {
                 }
             }
         }
-        IERC20(_token).transfer(msg.sender, balance);
+
+        //withdraw from aave
+        pool.withdraw(_token, balance, msg.sender)
+
+        //send token to user
+        // IERC20(_token).transfer(msg.sender, balance);//withdraw take care of it
     }
 
     // updates mapping telling us how any different token a user has staked
