@@ -204,14 +204,20 @@ def test_unstake_tokens(amount_staked):
         pytest.skip("Only for local testing!")
     account = get_account()
     staking_contract, project_token, weth_token = deploy_and_stake(amount_staked)
-    initial_balance_contract = weth_token.balanceOf(staking_contract.address)
+    initial_balance_contract = weth_token.balanceOf(
+        staking_contract.address
+    )  # 0 since its on aave
+    initial_balance_staker_on_contract = staking_contract.stakingBalance(
+        weth_token.address, account.address
+    )
     initial_balance_staker = weth_token.balanceOf(account.address)
 
     staking_contract.unstakeTokens(weth_token.address, {"from": account})
 
+    assert initial_balance_contract == 0
     assert (
         weth_token.balanceOf(staking_contract.address)
-        == initial_balance_contract - amount_staked
+        == initial_balance_staker_on_contract - amount_staked
     )
     assert (
         weth_token.balanceOf(account.address) == initial_balance_staker + amount_staked
@@ -220,7 +226,7 @@ def test_unstake_tokens(amount_staked):
     assert staking_contract.uniqueTokensStaked(account.address) == 0
 
 
-def test_unstake_token_empty_balance():
+def test_unstake_token_fails_empty_balance():
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
@@ -253,17 +259,22 @@ def test_unstake_token_multiple_stakers(amount_staked):
     stake_and_approve_token(staking_contract, weth_token, amount_staked, account)
     stake_and_approve_token(staking_contract, weth_token, 2 * amount_staked, acc2)
     initial_balance_contract = weth_token.balanceOf(staking_contract.address)
+    initial_balance_staker1_on_contract = staking_contract.stakingBalance(
+        weth_token.address, account.address
+    )
+    initial_balance_staker2_on_contract = staking_contract.stakingBalance(
+        weth_token.address, acc2.address
+    )
     initial_balance_staker1 = weth_token.balanceOf(account.address)
     initial_balance_staker2 = weth_token.balanceOf(acc2.address)
     initial_balance_non_staker = weth_token.balanceOf(non_staker.address)
 
     staking_contract.unstakeTokens(weth_token.address, {"from": acc2})
 
-    assert (
-        weth_token.balanceOf(staking_contract.address)
-        == initial_balance_contract - 2 * amount_staked
-    )
+    assert weth_token.balanceOf(staking_contract.address) == 0
     assert weth_token.balanceOf(account.address) == initial_balance_staker1
+    assert initial_balance_staker1_on_contract == amount_staked
+    assert initial_balance_staker2_on_contract == 2 * amount_staked
     assert (
         weth_token.balanceOf(acc2.address)
         == initial_balance_staker2 + 2 * amount_staked
