@@ -6,7 +6,7 @@ from scripts.helpful_scripts import (
     get_verify_status,
     get_weth,
 )
-from brownie import ProjectToken, StakingContract, config, network
+from brownie import ProjectToken, StakingContract, config, network, interface
 
 import yaml
 import json
@@ -22,6 +22,7 @@ def deploy_staking_contract_and_project_token(front_end_update=False):
     )
     staking_contract = StakingContract.deploy(
         project_token.address,
+        get_aave_lending_pool(),
         {"from": account},
         publish_source=get_verify_status(),
     )
@@ -41,6 +42,16 @@ def deploy_staking_contract_and_project_token(front_end_update=False):
     return staking_contract, project_token, weth_token
 
 
+def get_aave_lending_pool():
+    # return the address of the aave lending pool
+    lending_pool_addresses_provider = interface.ILendingPoolAddressesProvider(
+        config["networks"][network.show_active()]["lending_pool_addresses_provider"]
+    )
+    lending_pool_address = lending_pool_addresses_provider.getLendingPool()
+    lending_pool = interface.ILendingPool(lending_pool_address)
+    return lending_pool
+
+
 def add_allowed_tokens(staking_contract, pricefeed_of_token, account):
     for token in pricefeed_of_token:
         add_tx = staking_contract.addAllowedTokens(token.address, {"from": account})
@@ -53,7 +64,11 @@ def add_allowed_tokens(staking_contract, pricefeed_of_token, account):
 
 def stake_and_approve_token(staking_contract, token_address, amt, account):
     token_address.approve(staking_contract, amt, {"from": account})
-    tx = staking_contract.stakeTokens(amt, token_address, {"from": account})
+    tx = staking_contract.stakeTokens(
+        amt,
+        token_address,
+        {"from": account, "gas_limit": 1_000_000, "allow_revert": True},
+    )
     tx.wait(1)
 
 
@@ -99,13 +114,16 @@ def copy_folders_to_front_end(src, dest):
 
 def main():
     account = get_account()
-    front_end_update = True
+    front_end_update = False
     (
         staking_contract,
         project_token,
         weth_token,
     ) = deploy_staking_contract_and_project_token(front_end_update)
-    # weth_token_address = get_contract("weth_token")
-    # stake_and_approve_token(staking_contract, weth_token_address, POINT_ONE, account)
+    weth_token_address = get_contract("weth_token")
+    staking_contract = StakingContract[-1]
+    stake_and_approve_token(
+        staking_contract, weth_token_address, POINT_ONE / 10, account
+    )
 
-    # unstake_token(staking_contract, weth_token_address, account)
+    unstake_token(staking_contract, weth_token_address, account)

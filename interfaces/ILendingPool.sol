@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: agpl-3.0
 
 //from https://docs.aave.com/developers/v/2.0/the-core-protocol/lendingpool/ilendingpool
-pragma solidity 0.6.12;
+pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
-import {ILendingPoolAddressesProvider} from "@aave/contracts/interfaces/ILendingPoolAddressesProvider.sol";
-import {DataTypes} from "@aave/contracts/protocol/libraries/types/DataTypes.sol";
+// import {ILendingPoolAddressesProvider} from "@aave/contracts/interfaces/ILendingPoolAddressesProvider.sol";
+import "./ILendingPoolProvider.sol" as ILendingPoolAddressesProvider;
+
+// import {DataTypes} from "@aave/contracts/protocol/libraries/types/DataTypes.sol";
 
 interface ILendingPool {
     /**
@@ -369,25 +371,25 @@ interface ILendingPool {
 
     function setConfiguration(address reserve, uint256 configuration) external;
 
-    /**
-     * @dev Returns the configuration of the reserve
-     * @param asset The address of the underlying asset of the reserve
-     * @return The configuration of the reserve
-     **/
-    function getConfiguration(address asset)
-        external
-        view
-        returns (DataTypes.ReserveConfigurationMap memory);
+    // /**
+    //  * @dev Returns the configuration of the reserve
+    //  * @param asset The address of the underlying asset of the reserve
+    //  * @return The configuration of the reserve
+    //  **/
+    // function getConfiguration(address asset)
+    //     external
+    //     view
+    //     returns (DataTypes.ReserveConfigurationMap memory);
 
-    /**
-     * @dev Returns the configuration of the user across all the reserves
-     * @param user The user address
-     * @return The configuration of the user
-     **/
-    function getUserConfiguration(address user)
-        external
-        view
-        returns (DataTypes.UserConfigurationMap memory);
+    // /**
+    //  * @dev Returns the configuration of the user across all the reserves
+    //  * @param user The user address
+    //  * @return The configuration of the user
+    //  **/
+    // function getUserConfiguration(address user)
+    //     external
+    //     view
+    //     returns (DataTypes.UserConfigurationMap memory);
 
     /**
      * @dev Returns the normalized income normalized income of the reserve
@@ -409,15 +411,15 @@ interface ILendingPool {
         view
         returns (uint256);
 
-    /**
-     * @dev Returns the state and configuration of the reserve
-     * @param asset The address of the underlying asset of the reserve
-     * @return The state of the reserve
-     **/
-    function getReserveData(address asset)
-        external
-        view
-        returns (DataTypes.ReserveData memory);
+    // /**
+    //  * @dev Returns the state and configuration of the reserve
+    //  * @param asset The address of the underlying asset of the reserve
+    //  * @return The state of the reserve
+    //  **/
+    // function getReserveData(address asset)
+    //     external
+    //     view
+    //     returns (DataTypes.ReserveData memory);
 
     function finalizeTransfer(
         address asset,
@@ -430,10 +432,10 @@ interface ILendingPool {
 
     function getReservesList() external view returns (address[] memory);
 
-    function getAddressesProvider()
-        external
-        view
-        returns (ILendingPoolAddressesProvider);
+    // function getAddressesProvider()
+    //     external
+    //     view
+    //     returns (ILendingPoolAddressesProvider);
 
     function setPause(bool val) external;
 

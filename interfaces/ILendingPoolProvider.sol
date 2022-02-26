@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: agpl-3.0
 
 // from https://docs.aave.com/developers/v/2.0/the-core-protocol/addresses-provider/ilendingpooladdressesprovider
-pragma solidity 0.6.12;
+pragma solidity ^0.8.0;
 
 /**
  * @title LendingPoolAddressesProvider contract

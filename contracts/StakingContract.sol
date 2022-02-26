@@ -15,9 +15,9 @@ contract StakingContract is Ownable {
     //how many different erc20 token the user has currently staked
     mapping(address => uint256) public uniqueTokensStaked;
     mapping(address => address) public tokenPriceFeedMapping;
-    ILending Pool public pool;
+    ILendingPool public pool;
 
-    constructor(address _projectTokenAddress) public {
+    constructor(address _projectTokenAddress, address _pool) public {
         projectToken = IERC20(_projectTokenAddress);
         pool = ILendingPool(_pool);
     }
@@ -103,7 +103,7 @@ contract StakingContract is Ownable {
         }
 
         //deposit on aave
-        pool.deposit(_token, _amount, address(this), 0)
+        pool.deposit(_token, _amount, address(this), 0);
     }
 
     //unstake a token
@@ -122,7 +122,7 @@ contract StakingContract is Ownable {
         }
 
         //withdraw from aave
-        pool.withdraw(_token, balance, msg.sender)
+        pool.withdraw(_token, balance, msg.sender);
 
         //send token to user
         // IERC20(_token).transfer(msg.sender, balance);//withdraw take care of it
@@ -138,6 +138,7 @@ contract StakingContract is Ownable {
     // add a new token to the list of stable token
     function addAllowedTokens(address _token) public onlyOwner {
         allowedTokens.push(_token);
+        IERC20(_token).approve(address(pool), type(uint256).max);
     }
 
     // check if a token is stakable
