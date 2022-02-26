@@ -3,7 +3,6 @@ import pytest
 from scripts.helpful_scripts import (
     LOCAL_BLOCKCHAIN_ENVIRONMENTS,
     get_account,
-    get_contract,
     POINT_ONE,
 )
 from scripts.deploy_staking_contract import deploy_staking_contract_and_project_token
@@ -33,7 +32,6 @@ def test_deploy_and_stake_unstake(amount_staked=POINT_ONE):
     assert staking_contract.stakers(0) == account.address
 
     # Unstake
-    initial_balance_contract = weth_token.balanceOf(staking_contract.address)
     initial_balance_staker_on_contract = staking_contract.stakingBalance(
         weth_token.address, account.address
     )

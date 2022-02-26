@@ -4,7 +4,6 @@ from scripts.helpful_scripts import (
     CENT,
     POINT_ONE,
     get_verify_status,
-    get_weth,
     LOCAL_BLOCKCHAIN_ENVIRONMENTS,
 )
 from brownie import ProjectToken, StakingContract, config, network, interface
