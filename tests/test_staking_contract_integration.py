@@ -34,14 +34,16 @@ def test_deploy_and_stake_unstake(amount_staked=POINT_ONE):
 
     # Unstake
     initial_balance_contract = weth_token.balanceOf(staking_contract.address)
+    initial_balance_staker_on_contract = staking_contract.stakingBalance(
+        weth_token.address, account.address
+    )
     initial_balance_staker = weth_token.balanceOf(account.address)
 
     staking_contract.unstakeTokens(weth_token.address, {"from": account})
 
-    assert (
-        weth_token.balanceOf(staking_contract.address)
-        == initial_balance_contract - amount_staked
-    )
+    assert weth_token.balanceOf(staking_contract.address) == 0
+    assert initial_balance_staker_on_contract == amount_staked
+
     assert (
         weth_token.balanceOf(account.address) == initial_balance_staker + amount_staked
     )
