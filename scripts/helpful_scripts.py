@@ -7,6 +7,7 @@ from brownie import (
     Contract,
     MockWETH,
     MockDAI,
+    MockLendingPool,
 )
 from web3 import Web3
 
@@ -77,6 +78,7 @@ contract_to_mock = {
     "eth_usd_price_feed": MockV3Aggregator,
     "dai_usd_price_feed": MockV3Aggregator,
     "dai_token": MockDAI,
+    "lending_pool": MockLendingPool,
 }
 
 
@@ -120,10 +122,14 @@ def deploy_mocks():
         DECIMALS, INITIAL_PRICE_FEED_VALUE, {"from": account}
     )
     print(f"MockV3Aggregator deployed to {mock_price_feed}")
+
     mock_weth_token = MockWETH.deploy({"from": account})
     print(f"MockWETH deployed to {mock_weth_token.address}")
     mock_dai_token = MockDAI.deploy({"from": account})
     print(f"MockDAI deployed to {mock_dai_token.address}")
+
+    mock_lending_pool = MockLendingPool.deploy({"from": account})
+    print(f"MockLendingPool deployed to {mock_lending_pool}")
 
 
 def get_verify_status():

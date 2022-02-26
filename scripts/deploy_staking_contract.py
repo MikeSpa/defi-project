@@ -5,6 +5,7 @@ from scripts.helpful_scripts import (
     POINT_ONE,
     get_verify_status,
     get_weth,
+    LOCAL_BLOCKCHAIN_ENVIRONMENTS,
 )
 from brownie import ProjectToken, StakingContract, config, network, interface
 
@@ -44,11 +45,14 @@ def deploy_staking_contract_and_project_token(front_end_update=False):
 
 def get_aave_lending_pool():
     # return the address of the aave lending pool
-    lending_pool_addresses_provider = interface.ILendingPoolAddressesProvider(
-        config["networks"][network.show_active()]["lending_pool_addresses_provider"]
-    )
-    lending_pool_address = lending_pool_addresses_provider.getLendingPool()
-    lending_pool = interface.ILendingPool(lending_pool_address)
+    if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        lending_pool = get_contract("lending_pool")
+    else:
+        lending_pool_addresses_provider = interface.ILendingPoolAddressesProvider(
+            config["networks"][network.show_active()]["lending_pool_addresses_provider"]
+        )
+        lending_pool_address = lending_pool_addresses_provider.getLendingPool()
+        lending_pool = interface.ILendingPool(lending_pool_address)
     return lending_pool
 
 
