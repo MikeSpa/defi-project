@@ -7,7 +7,7 @@ pragma solidity ^0.8.0;
 //AaveLendingPool is ILending
 //CompoundSmth is ILending
 
-interface ILendingS {
+interface ILendingProtocol {
     /**
      * @notice Deposit '_amounts' worth of '_asset' to a lending protocol
      * @dev Will revert if the amount exceeds the balance.
