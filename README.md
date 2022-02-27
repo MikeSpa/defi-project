@@ -13,6 +13,7 @@ Later join with futur NFT marketplace project
 
 ## TODO
 
+- [ ] refactoring of deploy_staking_contract
 ### Token
 - [x] Token: deployment script
 - [x] Token: tests
