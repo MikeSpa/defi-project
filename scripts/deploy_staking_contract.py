@@ -6,7 +6,14 @@ from scripts.helpful_scripts import (
     get_verify_status,
     LOCAL_BLOCKCHAIN_ENVIRONMENTS,
 )
-from brownie import ProjectToken, StakingContract, config, network, interface
+from brownie import (
+    ProjectToken,
+    StakingContract,
+    AaveLending,
+    config,
+    network,
+    interface,
+)
 
 import yaml
 import json
@@ -22,7 +29,7 @@ def deploy_staking_contract_and_project_token(front_end_update=False):
     )
     staking_contract = StakingContract.deploy(
         project_token.address,
-        get_aave_lending_pool(),
+        deploy_aave_lending_protocol(),
         {"from": account},
         publish_source=get_verify_status(),
     )
@@ -40,6 +47,19 @@ def deploy_staking_contract_and_project_token(front_end_update=False):
     if front_end_update:
         update_front_end()
     return staking_contract, project_token, weth_token
+
+
+def deploy_aave_lending_protocol():
+    if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        aave_lending_protocol = get_contract("lending_pool")
+        return aave_lending_protocol
+    account = get_account()
+    aave_lending_protocol = AaveLending.deploy(
+        get_aave_lending_pool(),
+        {"from": account},
+        publish_source=get_verify_status(),
+    )
+    return aave_lending_protocol
 
 
 def get_aave_lending_pool():
