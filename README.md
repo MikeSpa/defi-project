@@ -7,7 +7,7 @@
 
 
 Trying a lot of stuff in DeFi: flash loan, farming, arbitrage, LP, trading, ...
-Coding interaction with Aave, Curve, ...
+Coding interaction with Aave, Compound, Curve, ...
 Later join with futur NFT marketplace project
 
 
@@ -24,17 +24,16 @@ Later join with futur NFT marketplace project
 - [ ] test       "
 - [ ] proxy to deposit on aave or compound, contract that take care of sending token x to one protocol and x to another
 
-### Aave interaction
+### Lending Protocol interaction
 
-- [ ] Add Aave interaction
-- [ ] Aave: deployment script
+- [x] Add Aave interaction
+- [x] Aave: deployment script
 - [ ] Aave: tests
-
-### Compound interaction
-
 - [ ] Add Compound interaction
-- [ ] deployment script
-- [ ] tests
+- [ ] C: deployment script
+- [ ] C: tests
+- [ ] Lending protocol Interface
+- [ ] Adapt contract to use several lending protocol
 
 ### Flash Loan
 - [x] Proper Flash Loan Contract
@@ -42,6 +41,7 @@ Later join with futur NFT marketplace project
 - [x] Loan: tests
 
 ### Others
+- [ ] Uniswap, Curve
 - [ ] DAO
 - [ ] Make a front end at some point
 
