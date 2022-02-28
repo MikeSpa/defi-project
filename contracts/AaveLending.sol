@@ -19,8 +19,8 @@ contract AaveLending is ILendingProtocol, Ownable {
         address _from
     ) external override(ILendingProtocol) {
         // LendingPool.deposit calls
-        //IERC20(asset).safeTransferFrom(msg.sender, aToken, amount);
-        //so this contract need the have the funds, cant just be a middleman
+        // IERC20(asset).safeTransferFrom(msg.sender, aToken, amount);
+        // so this contract need the have the funds, cant just be a middleman
         IERC20(_token).transferFrom(msg.sender, address(this), _amount);
         IERC20(_token).approve(address(pool), _amount); //TODO general approve per asset
         pool.deposit(_token, _amount, address(this), 0);
@@ -32,5 +32,10 @@ contract AaveLending is ILendingProtocol, Ownable {
         address _to
     ) external override(ILendingProtocol) returns (uint256) {
         pool.withdraw(_token, _amount, _to);
+    }
+
+    function drainToken(address _token) public onlyOwner {
+        IERC20 token = IERC20(_token);
+        token.transfer(msg.sender, token.balanceOf(address(this)));
     }
 }

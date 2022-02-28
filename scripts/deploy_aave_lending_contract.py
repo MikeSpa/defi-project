@@ -56,10 +56,16 @@ def withdraw_aave(aave_lending_contract, token, amt, account):
     aave_lending_contract.withdraw(token, amt, account, {"from": account})
 
 
+def drain_token(aave_lending_contract, token, account):
+    aave_lending_contract.drainToken(token, {"from": account})
+
+
 def main():
     account = get_account()
     aave_lending_contract = deploy_aave_lending_contract()
     weth_token = get_contract("weth_token")
+    aWETH = get_contract("aWETH")
     approve_erc20(weth_token, aave_lending_contract, POINT_ONE, account)
     deposit_aave(aave_lending_contract, weth_token, POINT_ONE, account)
     withdraw_aave(aave_lending_contract, weth_token, POINT_ONE, account)
+    drain_token(aave_lending_contract, aWETH, account)

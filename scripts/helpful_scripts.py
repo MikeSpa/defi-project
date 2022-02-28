@@ -8,6 +8,7 @@ from brownie import (
     MockWETH,
     MockDAI,
     MockLendingPool,
+    MockERC20,
 )
 from web3 import Web3
 
@@ -79,6 +80,7 @@ contract_to_mock = {
     "dai_usd_price_feed": MockV3Aggregator,
     "dai_token": MockDAI,
     "lending_pool": MockLendingPool,
+    "aWETH": MockERC20,
 }
 
 

@@ -31,6 +31,9 @@ networks:
     dai_token: '0xFab46E002BbF0b4509813474841E0716E6730136'
     cETH: '0x41b5844f4680a8c38fbb695b7f9cfd1f64474a72'
 
+    aWETH: '0x87b1f4cf9BD63f7BBD3eE1aD04E8F52540349347'
+    
+
 # wallets
 dotenv:
   .env
