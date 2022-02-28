@@ -57,7 +57,7 @@ def get_eth(amount=0.1):
 
 
 def approve_erc20(token_address, spender, amount, account):
-    print(f"#approve_erc20, {amount} {token_address}")
+    print(f"#approve_erc20, {amount} {token_address} for {spender}")
     erc20 = interface.IERC20(token_address)
     tx = erc20.approve(spender, amount, {"from": account})
     tx.wait(1)
