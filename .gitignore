@@ -5,6 +5,8 @@ __pycache__
 build/
 reports/
 
+misc-ignore/
+
 ## Front end
 # dependencies
 /node_modules
