@@ -40,7 +40,7 @@ export const Main = () => {
     // Our supported token
     const dappTokenAddress: string = chainId ? networkMapping[String(chainId)]["ProjectToken"][0] : constants.AddressZero
     const wethTokenAddress: string = chainId ? brownieConfig["networks"][networkName]["weth_token"] : constants.AddressZero
-    const daiTokenAddress: string = chainId ? brownieConfig["networks"][networkName]["dai_token"] : constants.AddressZero
+    const daiTokenAddress: string = chainId ? brownieConfig["networks"][networkName]["fau_token"] : constants.AddressZero
 
     const supportedTokens: Array<Token> = [
         {

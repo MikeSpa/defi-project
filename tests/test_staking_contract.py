@@ -88,15 +88,15 @@ def test_get_token_value():
         INITIAL_PRICE_FEED_VALUE,
         DECIMALS,
     )
-    dai_token = get_contract("dai_token")
+    fau_token = get_contract("fau_token")
     # token not added to contract
     with pytest.raises(exceptions.VirtualMachineError):
-        staking_contract.getTokenValue(dai_token.address)
+        staking_contract.getTokenValue(fau_token.address)
     pricefeed_of_token = {
-        dai_token: get_contract("dai_usd_price_feed"),
+        fau_token: get_contract("dai_usd_price_feed"),
     }
     add_allowed_tokens(staking_contract, pricefeed_of_token, account)
-    assert staking_contract.getTokenValue(dai_token.address) == (
+    assert staking_contract.getTokenValue(fau_token.address) == (
         INITIAL_PRICE_FEED_VALUE,
         DECIMALS,
     )
@@ -390,9 +390,9 @@ def test_get_user_total_value_with_different_tokens(amount_staked):
     ) = deploy_staking_contract_and_project_token()
 
     # Add different token (weth already added)
-    dai_token = get_contract("dai_token")
+    fau_token = get_contract("fau_token")
     pricefeed_of_token = {
-        dai_token: get_contract("dai_usd_price_feed"),
+        fau_token: get_contract("dai_usd_price_feed"),
         project_token: get_contract("dai_usd_price_feed"),
     }
     add_allowed_tokens(staking_contract, pricefeed_of_token, account)
@@ -405,7 +405,7 @@ def test_get_user_total_value_with_different_tokens(amount_staked):
         staking_contract.getUserTotalValue(account.address)
     # Stake tokens
     stake_and_approve_token(staking_contract, weth_token, amount_staked, account)
-    stake_and_approve_token(staking_contract, dai_token, amount_staked, account)
+    stake_and_approve_token(staking_contract, fau_token, amount_staked, account)
     stake_and_approve_token(staking_contract, project_token, amount_staked, account)
     # Get value
     total_value = staking_contract.getUserTotalValue(account.address)
@@ -417,7 +417,7 @@ def test_get_user_total_value_with_different_tokens(amount_staked):
     )
 
     user_value_dai = staking_contract.getUserSingleTokenValue(
-        account.address, dai_token.address
+        account.address, fau_token.address
     )
 
     assert user_value_weth == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS

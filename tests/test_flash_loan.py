@@ -20,12 +20,12 @@ def test_flash_fee():
     fee = 1000
     flash_lender = deploy_flash_lender(fee=fee)
     weth_token = get_contract("weth_token")
-    dai_token = get_contract("dai_token")
+    fau_token = get_contract("fau_token")
     flash_fee = flash_lender.flashFee(weth_token, CENT)
 
     assert flash_fee == CENT * fee / 10000
     with pytest.raises(exceptions.VirtualMachineError):
-        flash_lender.flashFee(dai_token, CENT)
+        flash_lender.flashFee(fau_token, CENT)
 
 
 # maxFlashLoan
@@ -39,8 +39,8 @@ def test_max_flash_loan_zero_if_no_balance():
 def test_max_flash_loan_zero_if_unsupported_token():
     fee = 1000
     flash_lender = deploy_flash_lender(fee=fee)
-    dai_token = get_contract("dai_token")
-    assert flash_lender.maxFlashLoan(dai_token) == 0
+    fau_token = get_contract("fau_token")
+    assert flash_lender.maxFlashLoan(fau_token) == 0
 
 
 def test_max_flash_loan_with_balance():
@@ -172,15 +172,15 @@ def test_flash_borrow_revert_amount_exceeds_balance():
 
 def test_flash_borrow_revert_unsupported_currency():
     account = get_account()
-    dai_token = get_contract("dai_token")
+    fau_token = get_contract("fau_token")
     flash_lender = deploy_flash_lender()
     flash_borrower = deploy_flash_borrower(flash_lender)
-    dai_token.transfer(flash_lender.address, CENT)
-    dai_token.transfer(flash_borrower, CENT)
-    amt = flash_lender.maxFlashLoan(dai_token)
+    fau_token.transfer(flash_lender.address, CENT)
+    fau_token.transfer(flash_borrower, CENT)
+    amt = flash_lender.maxFlashLoan(fau_token)
 
     with pytest.raises(exceptions.VirtualMachineError):
-        make_flash_loan(flash_borrower, dai_token, amt, account)
+        make_flash_loan(flash_borrower, fau_token, amt, account)
 
 
 def test_flash_borrow_revert_repay_failed():

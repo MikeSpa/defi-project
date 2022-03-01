@@ -30,7 +30,7 @@
             "dai_eth_price_feed": "0x22B58f1EbEDfCA50feF632bD73368b2FdA96D541",
             "eth_usd_price_feed": "0x9326BFA02ADD2366b30bacB125260Af641031331",
             "dai_usd_price_feed": "0x777A68032a88E5A84678A77Af2CD65A7b3c0775a",
-            "dai_token": "0xFab46E002BbF0b4509813474841E0716E6730136",
+            "fau_token": "0xFab46E002BbF0b4509813474841E0716E6730136",
             "cETH": "0x41b5844f4680a8c38fbb695b7f9cfd1f64474a72"
         }
     },

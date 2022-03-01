@@ -78,7 +78,7 @@ contract_to_mock = {
     "weth_token": MockWETH,
     "eth_usd_price_feed": MockV3Aggregator,
     "dai_usd_price_feed": MockV3Aggregator,
-    "dai_token": MockDAI,
+    "fau_token": MockDAI,
     "lending_pool": MockLendingPool,
     "aWETH": MockERC20,
 }
