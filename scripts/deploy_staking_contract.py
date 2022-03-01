@@ -26,14 +26,16 @@ def deploy_staking_contract_and_project_token(front_end_update=False):
     account = get_account()
     project_token = ProjectToken.deploy(
         {"from": account},
-        publish_source=get_verify_status(),
+        # publish_source=get_verify_status(),
+        publish_source=False,
     )
     lending_protocol = deploy_aave_lending_contract()
     staking_contract = StakingContract.deploy(
         project_token.address,
         lending_protocol,
         {"from": account},
-        publish_source=get_verify_status(),
+        # publish_source=get_verify_status(),
+        publish_source=False,
     )
     tx = project_token.transfer(
         staking_contract.address, project_token.totalSupply() - CENT, {"from": account}
@@ -59,7 +61,8 @@ def deploy_aave_lending_protocol():
     aave_lending_protocol = AaveLending.deploy(
         get_aave_lending_pool(),
         {"from": account},
-        publish_source=get_verify_status(),
+        # publish_source=get_verify_status(),
+        publish_source=False,
     )
     return aave_lending_protocol
 
