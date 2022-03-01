@@ -26,12 +26,25 @@ interface CErc20 {
 }
 
 contract CompoundLending is ILendingProtocol, Ownable {
-    event MyLog(string, uint256);
+    // event MyLog(string, uint256);
 
     mapping(address => address) public tokenToCtoken;
+    address public stakingContract;
+
+    modifier onlyStakingContract() {
+        require(
+            msg.sender == stakingContract,
+            "CompoundLending: Caller is not Staking Contract or owner"
+        );
+        _;
+    }
 
     constructor(address _dai, address _cDAI) {
         tokenToCtoken[_dai] = _cDAI;
+    }
+
+    function setStakingContract(address _stakingContract) public onlyOwner {
+        stakingContract = _stakingContract;
     }
 
     function addToken(address _token, address _cToken) public onlyOwner {
@@ -42,7 +55,7 @@ contract CompoundLending is ILendingProtocol, Ownable {
         address _token,
         uint256 _amount,
         address _from
-    ) public override(ILendingProtocol) onlyOwner {
+    ) public override(ILendingProtocol) onlyStakingContract {
         // Create a reference to the underlying asset contract, like DAI.
         IERC20 token = IERC20(_token);
 
@@ -58,7 +71,7 @@ contract CompoundLending is ILendingProtocol, Ownable {
         address _token,
         uint256 _amount,
         address _to
-    ) public override(ILendingProtocol) onlyOwner returns (uint256) {
+    ) public override(ILendingProtocol) onlyStakingContract returns (uint256) {
         // Create a reference to the corresponding cToken contract, like cDAI
         CErc20 cToken = CErc20(tokenToCtoken[_token]);
         cToken.redeemUnderlying(_amount);
