@@ -16,13 +16,11 @@ contract StakingContract is Ownable {
     //how many different erc20 token the user has currently staked
     mapping(address => uint256) public uniqueTokensStaked;
     mapping(address => address) public tokenPriceFeedMapping;
-    ILendingProtocol public lending_protocol;
+    ILendingProtocol public lendingProtocol;
 
-    constructor(address _projectTokenAddress, address _lending_protocol)
-        public
-    {
+    constructor(address _projectTokenAddress, address _lendingProtocol) public {
         projectToken = IERC20(_projectTokenAddress);
-        lending_protocol = ILendingProtocol(_lending_protocol);
+        lendingProtocol = ILendingProtocol(_lendingProtocol);
     }
 
     // set the price feed address for a token
@@ -106,7 +104,7 @@ contract StakingContract is Ownable {
         }
 
         //deposit on lending protocol
-        lending_protocol.deposit(_token, _amount, address(this));
+        lendingProtocol.deposit(_token, _amount, address(this));
     }
 
     //unstake a token
@@ -125,7 +123,7 @@ contract StakingContract is Ownable {
         }
 
         //withdraw from lending protocol
-        lending_protocol.withdraw(_token, balance, msg.sender);
+        lendingProtocol.withdraw(_token, balance, msg.sender);
 
         //send token to user
         // IERC20(_token).transfer(msg.sender, balance);//withdraw take care of it
@@ -141,7 +139,7 @@ contract StakingContract is Ownable {
     // add a new token to the list of stable token
     function addAllowedTokens(address _token) public onlyOwner {
         allowedTokens.push(_token);
-        IERC20(_token).approve(address(lending_protocol), type(uint256).max);
+        IERC20(_token).approve(address(lendingProtocol), type(uint256).max);
     }
 
     // check if a token is stakable
@@ -152,6 +150,17 @@ contract StakingContract is Ownable {
             }
         }
         return false;
+    }
+
+    function changeLendingProtocol(address _lendingProtocol) public onlyOwner {
+        //TODO
+        lendingProtocol = ILendingProtocol(_lendingProtocol);
+        for (uint256 i = 0; i < allowedTokens.length; i++) {
+            IERC20(allowedTokens[i]).approve(
+                address(lendingProtocol),
+                type(uint256).max
+            );
+        }
     }
 
     //TODO remove token

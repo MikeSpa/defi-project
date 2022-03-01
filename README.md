@@ -33,11 +33,12 @@ Later join with futur NFT marketplace project
 - [x] Add Aave interaction
 - [x] Aave: deployment script
 - [x] Aave: tests
-- [ ] Add Compound interaction
-- [ ] C: deployment script
-- [ ] C: tests
+- [x] Add Compound interaction
+- [x] C: deployment script
+- [x] C: tests
 - [x] Lending protocol Interface
-- [ ] Adapt contract to use several lending protocol
+- [x] Adapt contract to use several lending protocol
+- [ ] security/error handling
 
 ### Flash Loan
 - [x] Proper Flash Loan Contract
