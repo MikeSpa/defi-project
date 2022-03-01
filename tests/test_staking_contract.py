@@ -27,6 +27,7 @@ def test_set_price_feed_contract_revert_on_non_owner():
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
     with pytest.raises(exceptions.VirtualMachineError):
         staking_contract.setPriceFeedContract(
@@ -42,6 +43,7 @@ def test_set_price_feed_contract():
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
     price_feed_address = get_contract("weth_token")
     staking_contract.setPriceFeedContract(
@@ -58,7 +60,9 @@ def test_issue_token(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
-    token_farm, project_token, weth_token = deploy_and_stake(amount_staked)
+    token_farm, project_token, weth_token, lending_protocol = deploy_and_stake(
+        amount_staked
+    )
     starting_balance = project_token.balanceOf(account.address)
     token_farm.issueTokens({"from": account})
     ending_balance = project_token.balanceOf(account.address)
@@ -77,6 +81,7 @@ def test_get_token_value():
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
 
     assert staking_contract.getTokenValue(weth_token.address) == (
@@ -115,6 +120,7 @@ def test_add_allowed_tokens():
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
     staking_contract.addAllowedTokens(project_token.address, {"from": account})
 
@@ -134,6 +140,7 @@ def test_token_is_allowed():
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
     assert staking_contract.tokenIsAllowed(weth_token.address)
     assert not staking_contract.tokenIsAllowed(project_token)
@@ -153,6 +160,7 @@ def test_stake_tokens(amount_staked):
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
     weth_token.approve(staking_contract.address, amount_staked, {"from": account})
     staking_contract.stakeTokens(amount_staked, weth_token.address, {"from": account})
@@ -189,11 +197,15 @@ def test_stake_tokens_fails_if_not_positive_amt(amount_staked):
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
     weth_token.approve(staking_contract.address, amount_staked, {"from": account})
 
     with pytest.raises(exceptions.VirtualMachineError):
         staking_contract.stakeTokens(0, weth_token.address, {"from": account})
+
+
+# def test_stake
 
 
 # unstakeTokens
@@ -203,7 +215,9 @@ def test_unstake_tokens(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
-    staking_contract, project_token, weth_token = deploy_and_stake(amount_staked)
+    staking_contract, project_token, weth_token, lending_protocol = deploy_and_stake(
+        amount_staked
+    )
     initial_balance_contract = weth_token.balanceOf(
         staking_contract.address
     )  # 0 since its on aave
@@ -234,6 +248,7 @@ def test_unstake_token_fails_empty_balance():
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
     with pytest.raises(exceptions.VirtualMachineError):
 
@@ -253,6 +268,7 @@ def test_unstake_token_multiple_stakers(amount_staked):
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
     weth_token.transfer(acc2, 2 * amount_staked, {"from": account})
     # Stake
@@ -295,6 +311,7 @@ def test_transfer_ownership():
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
     owner = get_account()
     non_owner = get_account(index=1)
@@ -319,6 +336,7 @@ def test_get_user_value_no_staking(amount_staked):
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
 
     user_value = staking_contract.getUserSingleTokenValue(
@@ -331,7 +349,9 @@ def test_get_user_value(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
-    staking_contract, project_token, weth_token = deploy_and_stake(amount_staked)
+    staking_contract, project_token, weth_token, lending_protocol = deploy_and_stake(
+        amount_staked
+    )
 
     user_value = staking_contract.getUserSingleTokenValue(
         account.address, weth_token.address
@@ -350,6 +370,7 @@ def test_get_user_total_value_revert_if_no_stake():
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
 
     with pytest.raises(exceptions.VirtualMachineError):
@@ -365,6 +386,7 @@ def test_get_user_total_value_with_different_tokens(amount_staked):
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
 
     # Add different token (weth already added)
@@ -397,9 +419,7 @@ def test_get_user_total_value_with_different_tokens(amount_staked):
     user_value_dai = staking_contract.getUserSingleTokenValue(
         account.address, dai_token.address
     )
-    # print(staking_contract.allowedTokens(0))
-    # print(staking_contract.allowedTokens(1))
-    # print(staking_contract.allowedTokens(2))
+
     assert user_value_weth == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
     assert user_value_dai == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
     assert user_value_pjtk == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS

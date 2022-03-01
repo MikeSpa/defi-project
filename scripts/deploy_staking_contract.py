@@ -1,3 +1,4 @@
+from scripts.deploy_aave_lending_contract import deploy_aave_lending_contract
 from scripts.helpful_scripts import (
     get_account,
     get_contract,
@@ -27,9 +28,10 @@ def deploy_staking_contract_and_project_token(front_end_update=False):
         {"from": account},
         publish_source=get_verify_status(),
     )
+    lending_protocol = deploy_aave_lending_contract()
     staking_contract = StakingContract.deploy(
         project_token.address,
-        deploy_aave_lending_protocol(),
+        lending_protocol,
         {"from": account},
         publish_source=get_verify_status(),
     )
@@ -46,7 +48,7 @@ def deploy_staking_contract_and_project_token(front_end_update=False):
     add_allowed_tokens(staking_contract, pricefeed_of_token, account)
     if front_end_update:
         update_front_end()
-    return staking_contract, project_token, weth_token
+    return staking_contract, project_token, weth_token, lending_protocol
 
 
 def deploy_aave_lending_protocol():
@@ -112,9 +114,10 @@ def deploy_and_stake(amt=POINT_ONE):
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token()
     stake_and_approve_token(staking_contract, weth_token, amt, account)
-    return staking_contract, project_token, weth_token
+    return staking_contract, project_token, weth_token, lending_protocol
 
 
 def update_front_end():
@@ -142,6 +145,7 @@ def main():
         staking_contract,
         project_token,
         weth_token,
+        lending_protocol,
     ) = deploy_staking_contract_and_project_token(front_end_update)
     weth_token_address = get_contract("weth_token")
     staking_contract = StakingContract[-1]

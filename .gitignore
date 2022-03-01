@@ -6,6 +6,7 @@ build/
 reports/
 
 misc-ignore/
+scripts/script.py
 
 ## Front end
 # dependencies
