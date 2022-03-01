@@ -14,26 +14,29 @@ Later join with futur NFT marketplace project
 ## TODO
 
 - [ ] refactoring of deploy_staking_contract
+- [ ] get second account and differentiate between deployer ans user in tests
+
 ### Token
 - [x] Token: deployment script
 - [x] Token: tests
+- [ ] better way of issuing token to stakers
 
 ### Staking Contract
 - [x] deploy script
 - [x] test
 - [x] add Aave deposit/withdraw
-- [ ] test       "
-- [ ] proxy to deposit on aave or compound, contract that take care of sending token x to one protocol and x to another
+- [x] test       "
+- [x] proxy to deposit on aave or compound, contract that take care of sending token x to one protocol and x to another
 
 ### Lending Protocol interaction
 
 - [x] Add Aave interaction
 - [x] Aave: deployment script
-- [ ] Aave: tests
+- [x] Aave: tests
 - [ ] Add Compound interaction
 - [ ] C: deployment script
 - [ ] C: tests
-- [ ] Lending protocol Interface
+- [x] Lending protocol Interface
 - [ ] Adapt contract to use several lending protocol
 
 ### Flash Loan
