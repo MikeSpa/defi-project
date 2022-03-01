@@ -8,16 +8,29 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract AaveLending is ILendingProtocol, Ownable {
     ILendingPool public pool;
+    address public stakingContract;
+
+    modifier onlyStakingContract() {
+        require(
+            msg.sender == stakingContract,
+            "CompoundLending: Caller is not Staking Contract or owner"
+        );
+        _;
+    }
 
     constructor(address _pool) {
         pool = ILendingPool(_pool);
+    }
+
+    function setStakingContract(address _stakingContract) public onlyOwner {
+        stakingContract = _stakingContract;
     }
 
     function deposit(
         address _token,
         uint256 _amount,
         address _from
-    ) external override(ILendingProtocol) onlyOwner {
+    ) external override(ILendingProtocol) onlyStakingContract {
         // LendingPool.deposit calls
         // IERC20(asset).safeTransferFrom(msg.sender, aToken, amount);
         // so this contract need the have the funds, cant just be a middleman
@@ -30,7 +43,12 @@ contract AaveLending is ILendingProtocol, Ownable {
         address _token,
         uint256 _amount,
         address _to
-    ) external override(ILendingProtocol) onlyOwner returns (uint256) {
+    )
+        external
+        override(ILendingProtocol)
+        onlyStakingContract
+        returns (uint256)
+    {
         pool.withdraw(_token, _amount, _to);
     }
 
