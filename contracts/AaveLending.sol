@@ -17,7 +17,7 @@ contract AaveLending is ILendingProtocol, Ownable {
         address _token,
         uint256 _amount,
         address _from
-    ) external override(ILendingProtocol) {
+    ) external override(ILendingProtocol) onlyOwner {
         // LendingPool.deposit calls
         // IERC20(asset).safeTransferFrom(msg.sender, aToken, amount);
         // so this contract need the have the funds, cant just be a middleman
@@ -30,7 +30,7 @@ contract AaveLending is ILendingProtocol, Ownable {
         address _token,
         uint256 _amount,
         address _to
-    ) external override(ILendingProtocol) returns (uint256) {
+    ) external override(ILendingProtocol) onlyOwner returns (uint256) {
         pool.withdraw(_token, _amount, _to);
     }
 
