@@ -40,6 +40,10 @@ Later join with futur NFT marketplace project
 - [x] Adapt contract to use several lending protocol
 - [ ] security/error handling
 
+### Uniswap
+
+- [ ] Create pair PJTK/DAI
+- [ ] Do some arbitrage
 ### Flash Loan
 - [x] Proper Flash Loan Contract
 - [x] Loan: deployment script
