@@ -48,5 +48,6 @@ Later join with futur NFT marketplace project
 ### Others
 - [ ] Uniswap, Curve
 - [ ] DAO
-- [ ] Make a front end at some point
+- [x] Make a front end at some point
+- [ ] dydx, yearn
 
