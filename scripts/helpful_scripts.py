@@ -23,7 +23,9 @@ INITIAL_PRICE_FEED_VALUE = 123_456_000_000
 DECIMALS = 18
 
 
-def get_account(index=None, id=None):
+def get_account(index=None, id=None, user=None):
+    if user == 1:
+        accounts.add(config["wallets"]["from_key_user"])
     if index:
         return accounts[index]
     if id:

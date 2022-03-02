@@ -42,3 +42,4 @@ dotenv:
   .env
 wallets:
   from_key: ${PRIVATE_KEY}
+  from_key_user: ${PRIVATE_KEY_USER}
