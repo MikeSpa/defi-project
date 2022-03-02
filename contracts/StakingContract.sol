@@ -152,6 +152,7 @@ contract StakingContract is Ownable {
         return false;
     }
 
+    //change the lending protocol
     function changeLendingProtocol(address _lendingProtocol) public onlyOwner {
         //TODO
         lendingProtocol = ILendingProtocol(_lendingProtocol);

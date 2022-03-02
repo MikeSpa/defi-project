@@ -1,4 +1,6 @@
 from brownie import network, exceptions, ZERO_ADDRESS
+from scripts.deploy_aave_lending_contract import deploy_aave_lending_contract
+from scripts.deploy_compound_lending import deploy_compound_lending_contract
 from scripts.helpful_scripts import (
     LOCAL_BLOCKCHAIN_ENVIRONMENTS,
     INITIAL_PRICE_FEED_VALUE,
@@ -203,9 +205,6 @@ def test_stake_tokens_fails_if_not_positive_amt(amount_staked):
 
     with pytest.raises(exceptions.VirtualMachineError):
         staking_contract.stakeTokens(0, weth_token.address, {"from": account})
-
-
-# def test_stake
 
 
 # unstakeTokens
@@ -425,3 +424,27 @@ def test_get_user_total_value_with_different_tokens(amount_staked):
     assert user_value_pjtk == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
 
     assert total_value == user_value_weth + user_value_dai + user_value_pjtk
+
+
+## changeLendingProtocol
+
+
+def test_change_lending_protocol(amount_staked):
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("Only for local testing!")
+    account = get_account()
+    staking_contract, project_token, weth_token, lending_protocol = deploy_and_stake(
+        amount_staked
+    )
+
+    assert staking_contract.lendingProtocol() == lending_protocol
+
+    lending_protocol_compound = deploy_compound_lending_contract()
+    staking_contract.changeLendingProtocol(lending_protocol_compound)
+
+    assert staking_contract.lendingProtocol() == lending_protocol_compound
+
+    lending_protocol_aave = deploy_aave_lending_contract()
+    staking_contract.changeLendingProtocol(lending_protocol_aave)
+
+    assert staking_contract.lendingProtocol() == lending_protocol_aave
