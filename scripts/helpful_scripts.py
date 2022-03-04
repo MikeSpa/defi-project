@@ -18,6 +18,7 @@ LOCAL_BLOCKCHAIN_ENVIRONMENTS = ["development", "ganache-local", "hardhat"]
 CENT = Web3.toWei(100, "ether")
 POINT_ONE = Web3.toWei(0.1, "ether")
 TEN = Web3.toWei(10, "ether")
+ONE = Web3.toWei(1, "ether")
 
 INITIAL_PRICE_FEED_VALUE = 123_456_000_000
 DECIMALS = 18

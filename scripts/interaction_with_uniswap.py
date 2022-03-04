@@ -1,4 +1,6 @@
 from scripts.helpful_scripts import (
+    ONE,
+    POINT_ONE,
     get_account,
     get_contract,
     get_weth,
@@ -95,14 +97,35 @@ def add_liquidity(
     print(f"reservesB: {resB}")
 
 
+def remove_liquidity(
+    tokenA, tokenB, liquidity, amountAMin=0, amountBMin=0, to=get_account()
+):
+    account = get_account()
+    router = get_router()
+    liquidity_token = DAI_PJTK_PAIR
+    approve_erc20(liquidity_token, router, liquidity, account)
+    router.removeLiquidity(
+        tokenA,
+        tokenB,
+        liquidity,
+        amountAMin,
+        amountBMin,
+        to,
+        2 ** 255,
+        {"from": account, "gas_limit": 1_000_000, "allow_revert": True},
+    )
+
+
 def main():
     print("## Uniswap")
-    account = get_account()
+    # account = get_account()
     dai = get_contract("DAI")
-    weth = get_contract("weth_token")
+    # weth = get_contract("weth_token")
     pjtk = ProjectToken[-1]
 
     # pair = create_pair(dai, pjtk)
     # print(pair)
 
-    a, b, l = add_liquidity(dai, pjtk, TEN, TEN)
+    # add_liquidity(dai, pjtk, TEN, TEN)
+    lt = ONE
+    remove_liquidity(dai, pjtk, lt, POINT_ONE, POINT_ONE)
