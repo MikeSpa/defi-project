@@ -5,6 +5,7 @@ from scripts.helpful_scripts import (
     approve_erc20,
     LOCAL_BLOCKCHAIN_ENVIRONMENTS,
     FORKED_LOCAL_ENVIRNOMENT,
+    TEN,
 )
 from brownie import config, network, interface, ProjectToken
 from web3 import Web3
@@ -58,13 +59,12 @@ def add_liquidity(
     amount_b_min=None,
     to=get_account(),
 ):
-    # returns amountA, amountB, liquidity
     account = get_account()
     router = get_router()
     if not amount_a_min:
         amount_a_min = amount_a_desired * 99 / 100
-    if not amount_a_min:
-        amount_a_min = amount_a_desired * 99 / 100
+    if not amount_b_min:
+        amount_b_min = amount_b_desired * 99 / 100
 
     approve_erc20(tokenA, router, amount_a_desired, account)
     erc20 = interface.IERC20(tokenB)
@@ -75,9 +75,7 @@ def add_liquidity(
     resA, resB, _ = pair.getReserves()
     print(f"reservesA: {resA}")
     print(f"reservesB: {resB}")
-    # timestamp = tx.timestamp
 
-    # Fail with error 'ds-math-sub-underflow'
     tx = router.addLiquidity(
         tokenA,
         tokenB,
@@ -91,15 +89,10 @@ def add_liquidity(
         {"from": account, "gas_limit": 1_000_000, "allow_revert": True},
     )
     print(tx)
-    A, B, liquidity = tx.return_value
-    print(A)
-    print(B)
-    print(liquidity)
 
     resA, resB, _ = pair.getReserves()
     print(f"reservesA: {resA}")
     print(f"reservesB: {resB}")
-    return A, B, liquidity
 
 
 def main():
@@ -112,4 +105,4 @@ def main():
     # pair = create_pair(dai, pjtk)
     # print(pair)
 
-    a, b, l = add_liquidity(dai, pjtk, 10, 10)
+    a, b, l = add_liquidity(dai, pjtk, TEN, TEN)
