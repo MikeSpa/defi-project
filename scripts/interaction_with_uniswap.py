@@ -29,13 +29,10 @@ def get_router():
     )
 
 
-def get_pair_x():
-    return interface.IUniswapV2Pair(DAI_PJTK_PAIR)
-
-
 def get_pair(token0, token1):
     factory = get_factory()
-    return factory.getPair(token0, token1)
+    address = factory.getPair(token0, token1)
+    return interface.IUniswapV2Pair(address)
 
 
 def create_pair(token0, token1):
@@ -72,8 +69,7 @@ def add_liquidity(
     erc20 = interface.IERC20(tokenB)
     tx = erc20.approve(router, amount_b_desired, {"from": account})
     timestamp = tx.timestamp
-    print(timestamp)
-    pair = get_pair_x()
+    pair = get_pair(tokenA, tokenB)
     resA, resB, _ = pair.getReserves()
     print(f"reservesA: {resA}")
     print(f"reservesB: {resB}")
@@ -90,8 +86,6 @@ def add_liquidity(
         # 2 ** 255,
         {"from": account, "gas_limit": 1_000_000, "allow_revert": True},
     )
-    print(tx)
-
     resA, resB, _ = pair.getReserves()
     print(f"reservesA: {resA}")
     print(f"reservesB: {resB}")
@@ -126,6 +120,6 @@ def main():
     # pair = create_pair(dai, pjtk)
     # print(pair)
 
-    # add_liquidity(dai, pjtk, TEN, TEN)
+    add_liquidity(dai, pjtk, ONE, ONE)
     lt = ONE
-    remove_liquidity(dai, pjtk, lt, POINT_ONE, POINT_ONE)
+    # remove_liquidity(dai, pjtk, lt, POINT_ONE, POINT_ONE)
