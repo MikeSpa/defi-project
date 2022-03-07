@@ -42,7 +42,7 @@ Later join with futur NFT marketplace project
 
 ### Uniswap
 
-- [ ] Create pair PJTK/DAI
+- [x] Create pair PJTK/DAI
 - [ ] Do some arbitrage
 ### Flash Loan
 - [x] Proper Flash Loan Contract
