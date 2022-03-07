@@ -110,6 +110,24 @@ def remove_liquidity(
     )
 
 
+def swap(token1, token2, amt1):
+    print("swapping...")
+    account = get_account()
+    router = get_router()
+    # TODO get library.quote and put smth in minAmount
+    # reserves1, reserves2 = UniswapV2Library.getReserves(factory, token1, token2)
+    # quote = UniswapV2Library.quote(amt1, reserves1, reserves2)
+    approve_erc20(token1, router, amt1, account)
+    router.swapExactTokensForTokens(
+        amt1,
+        ONE / 10,
+        [token1, token2],
+        account,
+        2 ** 255,
+        {"from": account, "gas_limit": 1_000_000, "allow_revert": True},
+    )
+
+
 def main():
     print("## Uniswap")
     # account = get_account()
@@ -120,6 +138,9 @@ def main():
     # pair = create_pair(dai, pjtk)
     # print(pair)
 
-    add_liquidity(dai, pjtk, ONE, ONE)
-    lt = ONE
+    # add_liquidity(dai, pjtk, ONE, ONE)
+    # lt = ONE
     # remove_liquidity(dai, pjtk, lt, POINT_ONE, POINT_ONE)
+
+    swap(dai, pjtk, ONE)
+    swap(pjtk, dai, ONE)
