@@ -13,6 +13,8 @@ Later join with futur NFT marketplace project
 
 ## TODO
 
+- [ ] Move front end into diff repo
+- [ ] Same for Uniswap with arbitrage stuff
 - [ ] refactoring of deploy_staking_contract
 - [ ] get second account and differentiate between deployer ans user in tests
 
@@ -43,14 +45,16 @@ Later join with futur NFT marketplace project
 ### Uniswap
 
 - [x] Create pair PJTK/DAI
-- [ ] Do some arbitrage
+
+### Curve
+
+
 ### Flash Loan
 - [x] Proper Flash Loan Contract
 - [x] Loan: deployment script
 - [x] Loan: tests
 
 ### Others
-- [ ] Uniswap, Curve
 - [ ] DAO
 - [x] Make a front end at some point
 - [ ] dydx, yearn
