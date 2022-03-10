@@ -18,6 +18,19 @@ contract StakingContract is Ownable {
     mapping(address => address) public tokenPriceFeedMapping;
     ILendingProtocol public lendingProtocol;
 
+    event TokenAdded(address indexed token_address);
+    event TokenStaked(
+        address indexed token,
+        address indexed staker,
+        uint256 amount
+    );
+    event TokenUnstaked(
+        address indexed token,
+        address indexed staker,
+        uint256 amount
+    );
+    event LendingProtocolChanged(address newProtocol, address oldProtocol);
+
     constructor(address _projectTokenAddress, address _lendingProtocol) public {
         projectToken = IERC20(_projectTokenAddress);
         lendingProtocol = ILendingProtocol(_lendingProtocol);
@@ -98,6 +111,7 @@ contract StakingContract is Ownable {
         stakingBalance[_token][msg.sender] =
             stakingBalance[_token][msg.sender] +
             _amount;
+
         // add user to stakers list pnly if this is their first staking
         if (uniqueTokensStaked[msg.sender] == 1) {
             stakers.push(msg.sender);
@@ -105,6 +119,7 @@ contract StakingContract is Ownable {
 
         //deposit on lending protocol
         lendingProtocol.deposit(_token, _amount, address(this));
+        emit TokenStaked(_token, msg.sender, _amount);
     }
 
     //unstake a token
@@ -123,7 +138,11 @@ contract StakingContract is Ownable {
         }
 
         //withdraw from lending protocol
-        lendingProtocol.withdraw(_token, balance, msg.sender);
+        require(
+            lendingProtocol.withdraw(_token, balance, msg.sender) > 0,
+            "StakingContract: withdraw error"
+        );
+        emit TokenUnstaked(_token, msg.sender, balance);
 
         //send token to user
         // IERC20(_token).transfer(msg.sender, balance);//withdraw take care of it
@@ -140,6 +159,7 @@ contract StakingContract is Ownable {
     function addAllowedTokens(address _token) public onlyOwner {
         allowedTokens.push(_token);
         IERC20(_token).approve(address(lendingProtocol), type(uint256).max);
+        emit TokenAdded(_token);
     }
 
     // check if a token is stakable
@@ -155,6 +175,7 @@ contract StakingContract is Ownable {
     //change the lending protocol
     function changeLendingProtocol(address _lendingProtocol) public onlyOwner {
         //TODO
+        address oldProtocol = address(lendingProtocol);
         lendingProtocol = ILendingProtocol(_lendingProtocol);
         for (uint256 i = 0; i < allowedTokens.length; i++) {
             IERC20(allowedTokens[i]).approve(
@@ -162,6 +183,7 @@ contract StakingContract is Ownable {
                 type(uint256).max
             );
         }
+        emit LendingProtocolChanged(_lendingProtocol, oldProtocol);
     }
 
     //TODO remove token

@@ -50,6 +50,8 @@ contract AaveLending is ILendingProtocol, Ownable {
         returns (uint256)
     {
         pool.withdraw(_token, _amount, _to);
+
+        return _amount;
     }
 
     function drainToken(address _token) public onlyOwner {
