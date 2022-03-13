@@ -55,7 +55,10 @@ def test_deploy_and_stake_unstake_aave_lending(amount_staked=POINT_ONE / 10):
     # Unstake: deployer withdraw its weth
     ## weth: Aave pool -> AaveLending -> Stacking -> deployer
     ## aWETH: AaveLending -> ZERO, some stay on AaveLending
-    staking_contract.unstakeTokens(weth_token.address, {"from": account})
+    staking_contract.unstakeTokens(
+        weth_token.address,
+        {"from": account, "gas_limit": 1_000_000, "allow_revert": True},
+    )
 
     # StakingContract data is correct
     assert staking_contract.stakingBalance(weth_token.address, account) == 0
@@ -104,10 +107,6 @@ def test_deploy_and_stake_unstake_compound_lending(amount_staked=TEN):
     # Get states
     initial_DAI_deployer = DAI.balanceOf(account)
     initial_cDAI_deployer = cDAI.balanceOf(account)
-    initial_DAI_staking_contract = DAI.balanceOf(staking_contract)
-    initial_cDAI_staking_contract = cDAI.balanceOf(staking_contract)
-    initial_DAI_lending_protocol_contract = DAI.balanceOf(lending_protocol)
-    initial_cDAI_lending_protocol_contract = cDAI.balanceOf(lending_protocol)
 
     # Stake: deployer stake some DAI
     ## -> StakingC transfer to CompoundLending
