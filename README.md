@@ -14,6 +14,7 @@ Later join with futur NFT marketplace project
 ## TODO
 
 - [x] Add Events
+- [ ] Move asset from comp to aave 
 - [ ] Move front end into diff repo
 - [ ] Same for Uniswap with arbitrage stuff
 - [ ] refactoring of deploy_staking_contract
