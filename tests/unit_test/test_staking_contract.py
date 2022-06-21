@@ -1,4 +1,4 @@
-from brownie import network, exceptions, ZERO_ADDRESS
+from brownie import network, exceptions, ZERO_ADDRESS, reverts
 from scripts.deploy_aave_lending_contract import deploy_aave_lending_contract
 from scripts.deploy_compound_lending import deploy_compound_lending_contract
 from scripts.helpful_scripts import (
@@ -456,6 +456,7 @@ def test_get_user_total_value_with_different_tokens(amount_staked):
     # revert: No tokens staked!
     with pytest.raises(exceptions.VirtualMachineError):
         staking_contract.getUserTotalValue(account.address)
+
     # Stake tokens
     stake_and_approve_token(staking_contract, weth_token, amount_staked, account)
     stake_and_approve_token(staking_contract, fau_token, amount_staked, account)
@@ -502,6 +503,11 @@ def test_change_lending_protocol(amount_staked):
     staking_contract.changeLendingProtocol(lending_protocol_aave)
 
     assert staking_contract.lendingProtocol() == lending_protocol_aave
+
+    with reverts("Ownable: caller is not the owner"):
+        staking_contract.changeLendingProtocol(
+            lending_protocol_aave, {"from": get_account(1)}
+        )
 
 
 def test_event_change_lending_protocol(amount_staked):
