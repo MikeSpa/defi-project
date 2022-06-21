@@ -31,7 +31,7 @@ def test_set_price_feed_contract_revert_on_non_owner():
         weth_token,
         lending_protocol,
     ) = deploy_staking_contract_and_project_token()
-    with pytest.raises(exceptions.VirtualMachineError):
+    with reverts("Ownable: caller is not the owner"):
         staking_contract.setPriceFeedContract(
             weth_token.address, non_owner.address, {"from": non_owner}
         )
@@ -92,7 +92,7 @@ def test_get_token_value():
     )
     fau_token = get_contract("fau_token")
     # token not added to contract
-    with pytest.raises(exceptions.VirtualMachineError):
+    with reverts(""):
         staking_contract.getTokenValue(fau_token.address)
     pricefeed_of_token = {
         fau_token: get_contract("dai_usd_price_feed"),
@@ -128,7 +128,7 @@ def test_add_allowed_tokens():
 
     assert staking_contract.allowedTokens(0) == weth_token.address
     assert staking_contract.allowedTokens(1) == project_token.address
-    with pytest.raises(exceptions.VirtualMachineError):
+    with reverts("Ownable: caller is not the owner"):
         staking_contract.addAllowedTokens(project_token.address, {"from": non_owner})
 
 
@@ -190,13 +190,13 @@ def test_stake_tokens(amount_staked):
     assert staking_contract.uniqueTokensStaked(account.address) == 1
     assert staking_contract.stakers(0) == account.address
     # fails: token not allowed
-    with pytest.raises(exceptions.VirtualMachineError):
+    with reverts("StakingContract: Token is currently no allowed"):
         staking_contract.stakeTokens(
             amount_staked, project_token.address, {"from": account}
         )
     staking_contract.addAllowedTokens(project_token.address, {"from": account})
     # fails: allowance not approved to transfer
-    with pytest.raises(exceptions.VirtualMachineError):
+    with reverts("ERC20: transfer amount exceeds allowance"):
         staking_contract.stakeTokens(
             amount_staked, project_token.address, {"from": account}
         )
@@ -219,7 +219,7 @@ def test_stake_tokens_fails_if_not_positive_amt(amount_staked):
     ) = deploy_staking_contract_and_project_token()
     weth_token.approve(staking_contract.address, amount_staked, {"from": account})
 
-    with pytest.raises(exceptions.VirtualMachineError):
+    with reverts("StakingContract: Amount must be greater than 0"):
         staking_contract.stakeTokens(0, weth_token.address, {"from": account})
 
 
@@ -285,8 +285,7 @@ def test_unstake_token_fails_empty_balance():
         weth_token,
         lending_protocol,
     ) = deploy_staking_contract_and_project_token()
-    with pytest.raises(exceptions.VirtualMachineError):
-
+    with reverts("StakingContract: Staking balance already 0!"):
         staking_contract.unstakeTokens(weth_token.address, {"from": account})
 
 
@@ -369,12 +368,12 @@ def test_transfer_ownership():
     owner = get_account()
     non_owner = get_account(index=1)
 
-    with pytest.raises(exceptions.VirtualMachineError):
+    with reverts("Ownable: new owner is the zero address"):
         staking_contract.transferOwnership(ZERO_ADDRESS, {"from": owner})
 
     staking_contract.transferOwnership(non_owner, {"from": owner})
 
-    with pytest.raises(exceptions.VirtualMachineError):
+    with reverts("Ownable: caller is not the owner"):
         staking_contract.transferOwnership(non_owner, {"from": owner})
 
 
@@ -426,7 +425,7 @@ def test_get_user_total_value_revert_if_no_stake():
         lending_protocol,
     ) = deploy_staking_contract_and_project_token()
 
-    with pytest.raises(exceptions.VirtualMachineError):
+    with reverts(""):
         staking_contract.getUserTotalValue(account.address)
 
 
@@ -454,7 +453,7 @@ def test_get_user_total_value_with_different_tokens(amount_staked):
     )
     assert user_value_weth == 0
     # revert: No tokens staked!
-    with pytest.raises(exceptions.VirtualMachineError):
+    with reverts(""):
         staking_contract.getUserTotalValue(account.address)
 
     # Stake tokens
