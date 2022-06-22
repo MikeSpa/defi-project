@@ -30,15 +30,16 @@ contract StakingContract is Ownable {
         uint256 amount
     );
     event LendingProtocolChanged(address newProtocol, address oldProtocol);
+    event IssueTokenFailed(address receiver, uint256 amount);
 
-    constructor(address _projectTokenAddress, address _lendingProtocol) public {
+    constructor(address _projectTokenAddress, address _lendingProtocol) {
         projectToken = IERC20(_projectTokenAddress);
         lendingProtocol = ILendingProtocol(_lendingProtocol);
     }
 
     // set the price feed address for a token
     function setPriceFeedContract(address _token, address _priceFeed)
-        public
+        external
         onlyOwner
     {
         tokenPriceFeedMapping[_token] = _priceFeed;
@@ -46,12 +47,15 @@ contract StakingContract is Ownable {
 
     //issue project token to all stakers
     //TODO snapshot
-    function issueTokens() public onlyOwner {
+    function issueTokens() external onlyOwner {
         // Issue tokens to all stakers
         for (uint256 i = 0; i < stakers.length; i++) {
             address recipient = stakers[i];
             uint256 userTotalValue = getUserTotalValue(recipient);
-            projectToken.transfer(recipient, userTotalValue);
+            bool result = projectToken.transfer(recipient, userTotalValue);
+            if (!result) {
+                emit IssueTokenFailed(recipient, userTotalValue);
+            }
         }
     }
 
@@ -100,14 +104,17 @@ contract StakingContract is Ownable {
     }
 
     // stake a token
-    function stakeTokens(uint256 _amount, address _token) public {
+    function stakeTokens(uint256 _amount, address _token) external {
         require(_amount > 0, "StakingContract: Amount must be greater than 0");
         require(
             tokenIsAllowed(_token),
             "StakingContract: Token is currently no allowed"
         );
-        IERC20(_token).transferFrom(msg.sender, address(this), _amount);
-        updateUniqueTokensStaked(msg.sender, _token);
+        require(
+            IERC20(_token).transferFrom(msg.sender, address(this), _amount),
+            "StakingContract: transferFrom() failed"
+        );
+        _updateUniqueTokensStaked(msg.sender, _token);
         stakingBalance[_token][msg.sender] =
             stakingBalance[_token][msg.sender] +
             _amount;
@@ -123,7 +130,7 @@ contract StakingContract is Ownable {
     }
 
     //unstake a token
-    function unstakeTokens(address _token) public {
+    function unstakeTokens(address _token) external {
         uint256 balance = stakingBalance[_token][msg.sender];
         require(balance > 0, "StakingContract: Staking balance already 0!");
         stakingBalance[_token][msg.sender] = 0;
@@ -133,6 +140,7 @@ contract StakingContract is Ownable {
                 if (stakers[i] == msg.sender) {
                     stakers[i] = stakers[stakers.length - 1];
                     stakers.pop();
+                    break;
                 }
             }
         }
@@ -149,16 +157,19 @@ contract StakingContract is Ownable {
     }
 
     // updates mapping telling us how any different token a user has staked
-    function updateUniqueTokensStaked(address _user, address _token) internal {
+    function _updateUniqueTokensStaked(address _user, address _token) internal {
         if (stakingBalance[_token][_user] <= 0) {
             uniqueTokensStaked[_user] = uniqueTokensStaked[_user] + 1;
         }
     }
 
-    // add a new token to the list of stable token
-    function addAllowedTokens(address _token) public onlyOwner {
+    // add a new token to the lpublicist of stable token
+    function addAllowedTokens(address _token) external onlyOwner {
         allowedTokens.push(_token);
-        IERC20(_token).approve(address(lendingProtocol), type(uint256).max);
+        require(
+            IERC20(_token).approve(address(lendingProtocol), type(uint256).max),
+            "StakingContract: approve() failed"
+        );
         emit TokenAdded(_token);
     }
 
@@ -173,14 +184,20 @@ contract StakingContract is Ownable {
     }
 
     //change the lending protocol
-    function changeLendingProtocol(address _lendingProtocol) public onlyOwner {
+    function changeLendingProtocol(address _lendingProtocol)
+        external
+        onlyOwner
+    {
         //TODO
         address oldProtocol = address(lendingProtocol);
         lendingProtocol = ILendingProtocol(_lendingProtocol);
         for (uint256 i = 0; i < allowedTokens.length; i++) {
-            IERC20(allowedTokens[i]).approve(
-                address(lendingProtocol),
-                type(uint256).max
+            require(
+                IERC20(allowedTokens[i]).approve(
+                    address(lendingProtocol),
+                    type(uint256).max
+                ),
+                "StakingContract: approve() failed"
             );
         }
         emit LendingProtocolChanged(_lendingProtocol, oldProtocol);
