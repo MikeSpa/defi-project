@@ -184,23 +184,23 @@ contract StakingContract is Ownable {
     }
 
     //change the lending protocol
-    function changeLendingProtocol(address _lendingProtocol)
+    function changeLendingProtocol(address _newLendingProtocol)
         external
         onlyOwner
     {
         //TODO
         address oldProtocol = address(lendingProtocol);
-        lendingProtocol = ILendingProtocol(_lendingProtocol);
+        lendingProtocol = ILendingProtocol(_newLendingProtocol);
         for (uint256 i = 0; i < allowedTokens.length; i++) {
             require(
                 IERC20(allowedTokens[i]).approve(
-                    address(lendingProtocol),
+                    _newLendingProtocol,
                     type(uint256).max
                 ),
                 "StakingContract: approve() failed"
             );
         }
-        emit LendingProtocolChanged(_lendingProtocol, oldProtocol);
+        emit LendingProtocolChanged(_newLendingProtocol, oldProtocol);
     }
 
     //TODO remove token

@@ -518,12 +518,19 @@ def test_event_change_lending_protocol(amount_staked):
     )
 
     lending_protocol_compound = deploy_compound_lending_contract()
+    initial_lending_protocol = staking_contract.lendingProtocol()
     tx = staking_contract.changeLendingProtocol(lending_protocol_compound)
     assert (
         tx.events["LendingProtocolChanged"]["newProtocol"] == lending_protocol_compound
+    )
+    assert (
+        tx.events["LendingProtocolChanged"]["oldProtocol"] == initial_lending_protocol
     )
 
     lending_protocol_aave = deploy_aave_lending_contract()
     tx = staking_contract.changeLendingProtocol(lending_protocol_aave)
 
     assert tx.events["LendingProtocolChanged"]["newProtocol"] == lending_protocol_aave
+    assert (
+        tx.events["LendingProtocolChanged"]["oldProtocol"] == lending_protocol_compound
+    )
