@@ -2,16 +2,9 @@
 
 pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/ILendingProtocol.sol";
-
-interface Erc20 {
-    function approve(address, uint256) external returns (bool);
-
-    function transfer(address, uint256) external returns (bool);
-}
 
 interface CErc20 {
     function mint(uint256) external returns (uint256);
@@ -26,8 +19,6 @@ interface CErc20 {
 }
 
 contract CompoundLending is ILendingProtocol, Ownable {
-    // event MyLog(string, uint256);
-
     mapping(address => address) public tokenToCtoken;
     address public stakingContract;
 
@@ -43,27 +34,38 @@ contract CompoundLending is ILendingProtocol, Ownable {
         tokenToCtoken[_dai] = _cDAI;
     }
 
-    function setStakingContract(address _stakingContract) public onlyOwner {
+    function setStakingContract(address _stakingContract) external onlyOwner {
+        require(
+            _stakingContract != address(0),
+            "CompoundLending: address given is 0x0"
+        );
         stakingContract = _stakingContract;
+        emit StakingContractChange(_stakingContract);
     }
 
-    function addToken(address _token, address _cToken) public onlyOwner {
+    function addToken(address _token, address _cToken) external onlyOwner {
         tokenToCtoken[_token] = _cToken;
     }
 
     function deposit(
         address _token,
         uint256 _amount,
-        address _from
-    ) public override(ILendingProtocol) onlyStakingContract {
+        address /*_from*/
+    ) external override(ILendingProtocol) onlyStakingContract {
         // Create a reference to the underlying asset contract, like DAI.
         IERC20 token = IERC20(_token);
 
         // Create a reference to the corresponding cToken contract, like cDAI
         CErc20 cToken = CErc20(tokenToCtoken[_token]);
+        require(
+            token.transferFrom(msg.sender, address(this), _amount),
+            "CompoundLending: transferFrom() failed"
+        );
+        require(
+            token.approve(tokenToCtoken[_token], _amount),
+            "CompoundLending: approve() failed"
+        );
 
-        token.transferFrom(msg.sender, address(this), _amount);
-        token.approve(tokenToCtoken[_token], _amount);
         uint256 mintResult = cToken.mint(_amount);
     }
 
@@ -71,19 +73,34 @@ contract CompoundLending is ILendingProtocol, Ownable {
         address _token,
         uint256 _amount,
         address _to
-    ) public override(ILendingProtocol) onlyStakingContract returns (uint256) {
+    )
+        external
+        override(ILendingProtocol)
+        onlyStakingContract
+        returns (uint256)
+    {
         // Create a reference to the corresponding cToken contract, like cDAI
         CErc20 cToken = CErc20(tokenToCtoken[_token]);
-        cToken.redeemUnderlying(_amount);
+        uint256 amountWithdrawn = cToken.redeemUnderlying(_amount);
 
         IERC20 token = IERC20(_token);
-        token.transfer(_to, _amount);
+        require(
+            token.transfer(_to, amountWithdrawn),
+            "CompoundLending: transfer() failed"
+        );
 
-        return _amount;
+        return amountWithdrawn;
     }
 
-    function drainToken(address _ctoken) public onlyOwner {
+    function drainToken(address _ctoken)
+        external
+        override(ILendingProtocol)
+        onlyOwner
+    {
         IERC20 token = IERC20(_ctoken);
-        token.transfer(msg.sender, token.balanceOf(address(this)));
+        require(
+            token.transfer(msg.sender, token.balanceOf(address(this))),
+            "CompoundLending: transfer() failed"
+        );
     }
 }

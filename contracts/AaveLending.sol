@@ -10,12 +10,10 @@ contract AaveLending is ILendingProtocol, Ownable {
     ILendingPool public pool;
     address public stakingContract;
 
-    event StakingContractChange(address newContract);
-
     modifier onlyStakingContract() {
         require(
             msg.sender == stakingContract,
-            "CompoundLending: Caller is not Staking Contract or owner"
+            "AaveLending: Caller is not Staking Contract or owner"
         );
         _;
     }
