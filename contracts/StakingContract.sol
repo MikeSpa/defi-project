@@ -16,6 +16,8 @@ contract StakingContract is Ownable {
     //how many different erc20 token the user has currently staked
     mapping(address => uint256) public uniqueTokensStaked;
     mapping(address => address) public tokenPriceFeedMapping;
+    mapping(address => uint256) public tokenToWithdraw;
+
     ILendingProtocol public lendingProtocol;
 
     event TokenAdded(address indexed token_address);
@@ -30,7 +32,6 @@ contract StakingContract is Ownable {
         uint256 amount
     );
     event LendingProtocolChanged(address newProtocol, address oldProtocol);
-    event IssueTokenFailed(address receiver, uint256 amount);
 
     constructor(address _projectTokenAddress, address _lendingProtocol) {
         projectToken = IERC20(_projectTokenAddress);
@@ -45,18 +46,21 @@ contract StakingContract is Ownable {
         tokenPriceFeedMapping[_token] = _priceFeed;
     }
 
-    //issue project token to all stakers
-    //TODO snapshot
+    /// @notice Increase "ProjectToken" balance ^tokenToWithdraw^ for each user according to token staked
     function issueTokens() external onlyOwner {
         // Issue tokens to all stakers
         for (uint256 i = 0; i < stakers.length; i++) {
             address recipient = stakers[i];
             uint256 userTotalValue = getUserTotalValue(recipient);
-            bool result = projectToken.transfer(recipient, userTotalValue);
-            if (!result) {
-                emit IssueTokenFailed(recipient, userTotalValue);
-            }
+            tokenToWithdraw[recipient] += userTotalValue;
         }
+    }
+
+    /// @notice Send Earned "ProjectToken" to user
+    function withdrawToken() external {
+        uint256 amount = tokenToWithdraw[msg.sender];
+        tokenToWithdraw[msg.sender] = 0;
+        require(projectToken.transfer(msg.sender, amount));
     }
 
     // get the total value stake for a given user

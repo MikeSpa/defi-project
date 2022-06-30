@@ -65,12 +65,46 @@ def test_issue_token(amount_staked):
     token_farm, project_token, weth_token, lending_protocol = deploy_and_stake(
         amount_staked
     )
+    starting_balance_on_contract = token_farm.tokenToWithdraw(account)
+    # issue token
+    token_farm.issueTokens({"from": account})
+    ending_balance_on_contract = token_farm.tokenToWithdraw(account)
+    # check that balance tokenToWithdraw[account] has increased
+    assert (
+        ending_balance_on_contract
+        == starting_balance_on_contract
+        + amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+    )
+
+
+# withdrawToken
+def test_withdraw_token(amount_staked):
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("Only for local testing!")
+    account = get_account()
+    token_farm, project_token, weth_token, lending_protocol = deploy_and_stake(
+        amount_staked
+    )
     starting_balance = project_token.balanceOf(account.address)
     token_farm.issueTokens({"from": account})
+    tx = token_farm.withdrawToken({"from": account})
     ending_balance = project_token.balanceOf(account.address)
     assert (
         ending_balance
         == starting_balance + amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+    )
+    # Can't withdraw more
+    assert token_farm.tokenToWithdraw(account) == 0
+    token_farm.withdrawToken({"from": account})
+    assert project_token.balanceOf(account.address) == ending_balance
+
+    # Test Transfer Event
+    assert len(tx.events) == 1
+    assert tx.events["Transfer"]["from"] == token_farm
+    assert tx.events["Transfer"]["to"] == account
+    assert (
+        tx.events["Transfer"]["value"]
+        == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
     )
 
 
