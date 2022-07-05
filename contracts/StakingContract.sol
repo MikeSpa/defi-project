@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
-import "../interfaces/ILendingPool.sol";
 import "../interfaces/ILendingProtocol.sol";
 
 contract StakingContract is Ownable {
@@ -29,6 +28,7 @@ contract StakingContract is Ownable {
 
     ILendingProtocol public lendingProtocol;
 
+    // EVENTS
     event TokenAdded(address indexed token_address);
     event TokenStaked(
         address indexed token,
@@ -42,19 +42,74 @@ contract StakingContract is Ownable {
     );
     event LendingProtocolChanged(address newProtocol, address oldProtocol);
 
+    // CONSTRUCTOR
     constructor(address _projectTokenAddress, address _lendingProtocol) {
         projectToken = IERC20(_projectTokenAddress);
         lendingProtocol = ILendingProtocol(_lendingProtocol);
     }
 
-    /// @notice Set the price feed address for an ERC20 token
+    // PUBLIC FUNCTIONS
+
+    /// @notice Stake _amount of _token
+    /// @param _amount The amount ot stake
     /// @param _token The address of the token
-    /// @param _priceFeed The address of the pricefeed
-    function setPriceFeedContract(address _token, address _priceFeed)
-        public
-        onlyOwner
-    {
-        tokenPriceFeedMapping[_token] = _priceFeed;
+    function stakeTokens(uint256 _amount, address _token) external {
+        _updateYield(msg.sender);
+
+        require(_amount > 0, "StakingContract: Amount must be greater than 0");
+        require(
+            tokenIsAllowed(_token),
+            "StakingContract: Token is currently no allowed"
+        );
+        require(
+            IERC20(_token).transferFrom(msg.sender, address(this), _amount),
+            "StakingContract: transferFrom() failed"
+        );
+
+        if (stakingBalance[_token][msg.sender] == 0) {
+            uniqueTokensStaked[msg.sender] = uniqueTokensStaked[msg.sender] + 1;
+        }
+
+        stakingBalance[_token][msg.sender] =
+            stakingBalance[_token][msg.sender] +
+            _amount;
+
+        // add user to stakers list pnly if this is their first staking
+        if (uniqueTokensStaked[msg.sender] == 1) {
+            stakers.push(msg.sender);
+        }
+
+        //deposit on lending protocol
+        lendingProtocol.deposit(_token, _amount, address(this));
+        emit TokenStaked(_token, msg.sender, _amount);
+    }
+
+    /// @notice Unstake all _token staked
+    /// @param _token The address of the token
+    function unstakeTokens(address _token) external {
+        _updateYield(msg.sender);
+        uint256 balance = stakingBalance[_token][msg.sender];
+        require(balance > 0, "StakingContract: Staking balance already 0!");
+        // update contract data
+        stakingBalance[_token][msg.sender] = 0;
+        uniqueTokensStaked[msg.sender] = uniqueTokensStaked[msg.sender] - 1;
+        if (uniqueTokensStaked[msg.sender] == 0) {
+            for (uint256 i = 0; i < stakers.length; i++) {
+                if (stakers[i] == msg.sender) {
+                    stakers[i] = stakers[stakers.length - 1];
+                    stakers.pop();
+                    break;
+                }
+            }
+        }
+
+        //withdraw from lending protocol and send to user
+        //and send tokens to user
+        require(
+            lendingProtocol.withdraw(_token, balance, msg.sender) > 0,
+            "StakingContract: withdraw error"
+        );
+        emit TokenUnstaked(_token, msg.sender, balance);
     }
 
     /// @notice Send Earned "ProjectToken" to user
@@ -64,6 +119,18 @@ contract StakingContract is Ownable {
         uint256 amount = tokenToClaim[msg.sender];
         tokenToClaim[msg.sender] = 0;
         require(projectToken.transfer(msg.sender, amount));
+    }
+
+    /// @notice Check wheter a token is stakable on this contract
+    /// @param _token The address of the token
+    /// @return bool Wheter the token is stakable or not
+    function tokenIsAllowed(address _token) public view returns (bool) {
+        for (uint256 i = 0; i < allowedTokens.length; i++) {
+            if (allowedTokens[i] == _token) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /// @notice Get the total value (in USD) staked by _user
@@ -117,86 +184,22 @@ contract StakingContract is Ownable {
         return (uint256(price), decimals);
     }
 
-    /// @notice Update the tokenToClaim variable of _user
-    /// @param _user The address of the user
-    function _updateYield(address _user) internal {
-        uint256 unrealisedYieldTime = userToUnrealisedYieldTime[_user];
-        userToUnrealisedYieldTime[_user] = block.timestamp;
+    // ONLYOWNER
 
-        uint256 totalValue = getUserTotalValue(_user);
-        uint256 time = block.timestamp - unrealisedYieldTime;
-        uint256 secondsInDay = 86400;
-        //TODO yieldRate[_token]
-        uint256 additionalYield = ((totalValue * time * yieldRate) / 1000) /
-            secondsInDay;
-
-        tokenToClaim[_user] += additionalYield;
+    /// @notice Set the price feed address for an ERC20 token
+    /// @dev Gets call automatically when adding new token
+    /// @param _token The address of the token
+    /// @param _priceFeed The address of the pricefeed
+    function setPriceFeedContract(address _token, address _priceFeed)
+        public
+        onlyOwner
+    {
+        tokenPriceFeedMapping[_token] = _priceFeed;
     }
 
-    // stake a token
-    function stakeTokens(uint256 _amount, address _token) external {
-        _updateYield(msg.sender);
-
-        require(_amount > 0, "StakingContract: Amount must be greater than 0");
-        require(
-            tokenIsAllowed(_token),
-            "StakingContract: Token is currently no allowed"
-        );
-        require(
-            IERC20(_token).transferFrom(msg.sender, address(this), _amount),
-            "StakingContract: transferFrom() failed"
-        );
-        _updateUniqueTokensStaked(msg.sender, _token);
-
-        stakingBalance[_token][msg.sender] =
-            stakingBalance[_token][msg.sender] +
-            _amount;
-
-        // add user to stakers list pnly if this is their first staking
-        if (uniqueTokensStaked[msg.sender] == 1) {
-            stakers.push(msg.sender);
-        }
-
-        //deposit on lending protocol
-        lendingProtocol.deposit(_token, _amount, address(this));
-        emit TokenStaked(_token, msg.sender, _amount);
-    }
-
-    //unstake a token
-    function unstakeTokens(address _token) external {
-        _updateYield(msg.sender);
-        uint256 balance = stakingBalance[_token][msg.sender];
-        require(balance > 0, "StakingContract: Staking balance already 0!");
-        // update contract data
-        stakingBalance[_token][msg.sender] = 0;
-        uniqueTokensStaked[msg.sender] = uniqueTokensStaked[msg.sender] - 1;
-        if (uniqueTokensStaked[msg.sender] == 0) {
-            for (uint256 i = 0; i < stakers.length; i++) {
-                if (stakers[i] == msg.sender) {
-                    stakers[i] = stakers[stakers.length - 1];
-                    stakers.pop();
-                    break;
-                }
-            }
-        }
-
-        //withdraw from lending protocol and send to user
-        //and send tokens to user
-        require(
-            lendingProtocol.withdraw(_token, balance, msg.sender) > 0,
-            "StakingContract: withdraw error"
-        );
-        emit TokenUnstaked(_token, msg.sender, balance);
-    }
-
-    // updates mapping telling us how many different token a user has staked
-    function _updateUniqueTokensStaked(address _user, address _token) internal {
-        if (stakingBalance[_token][_user] <= 0) {
-            uniqueTokensStaked[_user] = uniqueTokensStaked[_user] + 1;
-        }
-    }
-
-    // add a new token to the lpublicist of stable token
+    /// @notice Add a new _token to the list of stakable token
+    /// @param _token The address of the token
+    /// @param _pricefeed The address for the price feed of _token
     function addAllowedTokens(address _token, address _pricefeed)
         external
         onlyOwner
@@ -210,17 +213,8 @@ contract StakingContract is Ownable {
         emit TokenAdded(_token);
     }
 
-    // check if a token is stakable
-    function tokenIsAllowed(address _token) public view returns (bool) {
-        for (uint256 i = 0; i < allowedTokens.length; i++) {
-            if (allowedTokens[i] == _token) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //change the lending protocol
+    /// @notice Change the lending protocol
+    /// @param _newLendingProtocol The address of the new lending protocol contract
     function changeLendingProtocol(address _newLendingProtocol)
         external
         onlyOwner
@@ -240,5 +234,22 @@ contract StakingContract is Ownable {
         emit LendingProtocolChanged(_newLendingProtocol, oldProtocol);
     }
 
-    //TODO remove token
+    //  INTERNAL FUNCTION
+
+    //TODO could be a modifier
+    /// @notice Update the tokenToClaim variable of _user
+    /// @param _user The address of the user
+    function _updateYield(address _user) internal {
+        uint256 unrealisedYieldTime = userToUnrealisedYieldTime[_user];
+        userToUnrealisedYieldTime[_user] = block.timestamp;
+
+        uint256 totalValue = getUserTotalValue(_user);
+        uint256 time = block.timestamp - unrealisedYieldTime;
+        uint256 secondsInDay = 86400;
+        //TODO yieldRate[_token]
+        uint256 additionalYield = ((totalValue * time * yieldRate) / 1000) /
+            secondsInDay;
+
+        tokenToClaim[_user] += additionalYield;
+    }
 }

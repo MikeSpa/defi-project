@@ -1,30 +1,29 @@
 # DeFi Project
 
-- ERC20 Token `ProjectToken`
-- Staking contract
-- FlashLoan contract 
-- Deposit and Withdraw to Aave and Compound
+Staking Dapp with front-end that allows users to stake various ERC20 tokens and earn a yield in a custom token `ProjectToken`. The contract interact with Aave and Compound to deposit the token received from the users and earn a yield.
 
-
-Trying a lot of stuff in DeFi: flash loan, farming, arbitrage, LP, trading, ...
-Coding interaction with Aave, Compound, Curve, ...
-Later join with NFT marketplace project.
+- ERC20 Token: `ProjectToken.sol`
+- Staking contract: `StakingContract.sol`
+- Interface to interact with lending protocol: `ILendingProtocol`
+- Implementation of that interface for Aave and Compound.
 
 
 ## TODO
 
 - [x] Add Events
-- [ ] Move asset from comp to aave 
+- [ ] Implement moving asset from comp to aave 
 - [ ] Move front end into diff repo
 - [ ] Remove contracts not related to StakingContract: flashloan stuff, uniswap, ...
 - [ ] refactoring of deploy_staking_contract
 - [ ] get second account and differentiate between deployer ans user in tests
-- [ ] extensively tests yield
+- [ ] extensively tests claimToken
+- [ ] rewrite integration test for new implementation
+- [ ] add nicer interface for front-end: graphs with token staked, yield earned, ...
 
 ### Token
 - [x] Token: deployment script
 - [x] Token: tests
-- [ ] better way of issuing token to stakers
+- [x] better way of issuing token to stakers
 
 ### Staking Contract
 - [x] deploy script
@@ -45,20 +44,8 @@ Later join with NFT marketplace project.
 - [x] Adapt contract to use several lending protocol
 - [x] security/error handling
 
-### Uniswap
-
-- [x] Create pair PJTK/DAI
-
-### Curve
-
-
-### Flash Loan
-- [x] Proper Flash Loan Contract
-- [x] Loan: deployment script
-- [x] Loan: tests
 
 ### Others
 - [ ] DAO
-- [x] Make a front end at some point
-- [ ] dydx, yearn
+
 
