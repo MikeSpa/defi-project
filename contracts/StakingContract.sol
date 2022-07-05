@@ -219,7 +219,6 @@ contract StakingContract is Ownable {
         external
         onlyOwner
     {
-        //TODO
         address oldProtocol = address(lendingProtocol);
         lendingProtocol = ILendingProtocol(_newLendingProtocol);
         for (uint256 i = 0; i < allowedTokens.length; i++) {
@@ -230,6 +229,21 @@ contract StakingContract is Ownable {
                 ),
                 "StakingContract: approve() failed"
             );
+        }
+        //withdraw and redeposit
+        for (uint256 i = 0; i < allowedTokens.length; i++) {
+            address token = allowedTokens[i];
+            uint256 totalStaked = 0;
+            for (uint256 j = 0; j < stakers.length; j++) {
+                address staker = stakers[j];
+                totalStaked += stakingBalance[staker][token];
+            }
+            ILendingProtocol(oldProtocol).withdraw(
+                token,
+                totalStaked,
+                address(this)
+            );
+            lendingProtocol.deposit(token, totalStaked, address(this));
         }
         emit LendingProtocolChanged(_newLendingProtocol, oldProtocol);
     }
