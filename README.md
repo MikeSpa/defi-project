@@ -8,7 +8,7 @@
 
 Trying a lot of stuff in DeFi: flash loan, farming, arbitrage, LP, trading, ...
 Coding interaction with Aave, Compound, Curve, ...
-Later join with futur NFT marketplace project
+Later join with NFT marketplace project.
 
 
 ## TODO
@@ -16,7 +16,7 @@ Later join with futur NFT marketplace project
 - [x] Add Events
 - [ ] Move asset from comp to aave 
 - [ ] Move front end into diff repo
-- [ ] Same for Uniswap with arbitrage stuff
+- [ ] Remove contracts not related to StakingContract: flashloan stuff, uniswap, ...
 - [ ] refactoring of deploy_staking_contract
 - [ ] get second account and differentiate between deployer ans user in tests
 
@@ -42,7 +42,7 @@ Later join with futur NFT marketplace project
 - [x] C: tests
 - [x] Lending protocol Interface
 - [x] Adapt contract to use several lending protocol
-- [ ] security/error handling
+- [x] security/error handling
 
 ### Uniswap
 

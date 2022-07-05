@@ -12,11 +12,17 @@ contract StakingContract is Ownable {
     IERC20 public projectToken;
     address[] public stakers;
     address[] public allowedTokens;
+    //user -> ERC20 -> amount stakes
     mapping(address => mapping(address => uint256)) public stakingBalance;
     //how many different erc20 token the user has currently staked
     mapping(address => uint256) public uniqueTokensStaked;
+    // ERC20 -> price feed address
     mapping(address => address) public tokenPriceFeedMapping;
-    mapping(address => uint256) public tokenToWithdraw;
+    // user -> amount of projectToken they can claimed
+    mapping(address => uint256) public tokenToClaim;
+    // how much token user can earn per amount of time
+    // token earn = total value [USD] * rewardRate * time period[timestamp]
+    uint256 public rewardRate = 1;
 
     ILendingProtocol public lendingProtocol;
 
@@ -38,7 +44,9 @@ contract StakingContract is Ownable {
         lendingProtocol = ILendingProtocol(_lendingProtocol);
     }
 
-    // set the price feed address for a token
+    /// @notice Set the price feed address for an ERC20 token
+    /// @param _token The address of the token
+    /// @param _priceFeed The address of the pricefeed
     function setPriceFeedContract(address _token, address _priceFeed)
         external
         onlyOwner
@@ -46,24 +54,26 @@ contract StakingContract is Ownable {
         tokenPriceFeedMapping[_token] = _priceFeed;
     }
 
-    /// @notice Increase "ProjectToken" balance ^tokenToWithdraw^ for each user according to token staked
+    /// @notice Increase "ProjectToken" balance `tokenToClaim` for each user according to token staked
     function issueTokens() external onlyOwner {
         // Issue tokens to all stakers
         for (uint256 i = 0; i < stakers.length; i++) {
             address recipient = stakers[i];
             uint256 userTotalValue = getUserTotalValue(recipient);
-            tokenToWithdraw[recipient] += userTotalValue;
+            tokenToClaim[recipient] += userTotalValue;
         }
     }
 
     /// @notice Send Earned "ProjectToken" to user
-    function withdrawToken() external {
-        uint256 amount = tokenToWithdraw[msg.sender];
-        tokenToWithdraw[msg.sender] = 0;
+    function claimToken() external {
+        uint256 amount = tokenToClaim[msg.sender];
+        tokenToClaim[msg.sender] = 0;
         require(projectToken.transfer(msg.sender, amount));
     }
 
-    // get the total value stake for a given user
+    /// @notice Get the total value (in USD) staked by _user
+    /// @param _user The address of the user
+    /// @return totalValue The total value  of the tokens staked on the contract by _user
     function getUserTotalValue(address _user) public view returns (uint256) {
         uint256 totalValue = 0;
         require(
@@ -77,7 +87,10 @@ contract StakingContract is Ownable {
         return totalValue;
     }
 
-    // get the value staked on one token for a user
+    /// @notice Get the value (in USD) of _token staked by _user
+    /// @param _user The address of the user
+    /// @param _token The address of the token
+    /// @return tokenValue The value of _token staked on the contract by _user
     function getUserSingleTokenValue(address _user, address _token)
         public
         view
@@ -87,12 +100,19 @@ contract StakingContract is Ownable {
             return 0;
         }
         (uint256 price, uint256 decimals) = getTokenValue(_token);
-        return ((stakingBalance[_token][_user] * price) / (10**decimals));
+        //TODO
+        uint256 tokenValue = ((stakingBalance[_token][_user] * price) /
+            (10**decimals));
+        return tokenValue;
         //          amt staked                  * price  / 10**8
-        // E.G.     10 ETH                      * 3'000(usd/eth)/ 100_000_000
+        // E.G.     10 WETH                      * 3'000(usd/weth)/ 100_000_000
     }
 
-    // get the value of a token
+    //
+    /// @notice Get the value (in USD) of a _token and its decimals()
+    /// @param _token The address of the token
+    /// @return price The value of _token
+    /// @return decimals The number of decimals of the _token
     function getTokenValue(address _token)
         public
         view
@@ -137,6 +157,7 @@ contract StakingContract is Ownable {
     function unstakeTokens(address _token) external {
         uint256 balance = stakingBalance[_token][msg.sender];
         require(balance > 0, "StakingContract: Staking balance already 0!");
+        // update contract data
         stakingBalance[_token][msg.sender] = 0;
         uniqueTokensStaked[msg.sender] = uniqueTokensStaked[msg.sender] - 1;
         if (uniqueTokensStaked[msg.sender] == 0) {
@@ -149,18 +170,16 @@ contract StakingContract is Ownable {
             }
         }
 
-        //withdraw from lending protocol
+        //withdraw from lending protocol and send to user
+        //and send tokens to user
         require(
             lendingProtocol.withdraw(_token, balance, msg.sender) > 0,
             "StakingContract: withdraw error"
         );
         emit TokenUnstaked(_token, msg.sender, balance);
-
-        //send token to user
-        // IERC20(_token).transfer(msg.sender, balance);//withdraw take care of it
     }
 
-    // updates mapping telling us how any different token a user has staked
+    // updates mapping telling us how many different token a user has staked
     function _updateUniqueTokensStaked(address _user, address _token) internal {
         if (stakingBalance[_token][_user] <= 0) {
             uniqueTokensStaked[_user] = uniqueTokensStaked[_user] + 1;

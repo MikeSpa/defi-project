@@ -11,7 +11,7 @@ interface ILendingProtocol {
     event StakingContractChange(address newContract);
 
     /**
-     * @notice Deposit '_amounts' worth of '_asset' to a lending protocol
+     * @notice Deposit '_amount' worth of '_token' to a lending protocol
      * @dev Will revert if the amount exceeds the balance.
      * @param _token The address of the token to be deposited
      * @param _amount The amount to deposit
@@ -24,11 +24,11 @@ interface ILendingProtocol {
     ) external;
 
     /**
-     * @notice Withdraw '_amounts' worth of '_asset' from a lending protocol
+     * @notice Withdraw '_amount' worth of '_token' from a lending protocol AND send it to _to
      * @dev Will revert if the amount exceeds the balance deposited.
      * @param _token The address of the token to be deposited
      * @param _amount The amount to withdraw
-     * @param _to The address that should receive thefunds
+     * @param _to The address that should receive the funds
      * @return The final amount withdrawn
      */
     function withdraw(
