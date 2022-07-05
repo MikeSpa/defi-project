@@ -16,6 +16,7 @@ from scripts.deploy_staking_contract import (
     deploy_and_stake,
     stake_and_approve_token,
 )
+import time
 
 
 # setPriceFeedContract
@@ -57,24 +58,24 @@ def test_set_price_feed_contract():
     )
 
 
-# issueToken
-def test_issue_token(amount_staked):
-    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
-        pytest.skip("Only for local testing!")
-    account = get_account()
-    token_farm, project_token, weth_token, lending_protocol = deploy_and_stake(
-        amount_staked
-    )
-    starting_balance_on_contract = token_farm.tokenToClaim(account)
-    # issue token
-    token_farm.issueTokens({"from": account})
-    ending_balance_on_contract = token_farm.tokenToClaim(account)
-    # check that balance tokenToClaim[account] has increased
-    assert (
-        ending_balance_on_contract
-        == starting_balance_on_contract
-        + amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
-    )
+# # issueToken
+# def test_issue_token(amount_staked):
+#     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+#         pytest.skip("Only for local testing!")
+#     account = get_account()
+#     token_farm, project_token, weth_token, lending_protocol = deploy_and_stake(
+#         amount_staked
+#     )
+#     starting_balance_on_contract = token_farm.tokenToClaim(account)
+#     # issue token
+#     token_farm.issueTokens({"from": account})
+#     ending_balance_on_contract = token_farm.tokenToClaim(account)
+#     # check that balance tokenToClaim[account] has increased
+#     assert (
+#         ending_balance_on_contract
+#         == starting_balance_on_contract
+#         + amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+#     )
 
 
 # claimToken
@@ -82,21 +83,35 @@ def test_claim_token(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
-    token_farm, project_token, weth_token, lending_protocol = deploy_and_stake(
+    token_farm, project_token, weth_token, lending_protocol, tx = deploy_and_stake(
         amount_staked
     )
+    start_time = tx.timestamp
     starting_balance = project_token.balanceOf(account.address)
-    token_farm.issueTokens({"from": account})
+    # token_farm.issueTokens({"from": account})
+    time.sleep(5)
     tx = token_farm.claimToken({"from": account})
+    end_time = tx.timestamp
+    staking_time = end_time - start_time
+    yieldRate = token_farm.yieldRate()
+    # additionalYield = amount_staked * staking_time * yieldRate / 1000 / 86400
     ending_balance = project_token.balanceOf(account.address)
     assert (
         ending_balance
-        == starting_balance + amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+        == starting_balance
+        + amount_staked
+        * INITIAL_PRICE_FEED_VALUE
+        / 10 ** DECIMALS
+        * staking_time
+        * yieldRate
+        / 1000
+        / 86400
     )
-    # Can't withdraw more
+    # Can claim more if time has passed
+    time.sleep(1)
     assert token_farm.tokenToClaim(account) == 0
     token_farm.claimToken({"from": account})
-    assert project_token.balanceOf(account.address) == ending_balance
+    assert project_token.balanceOf(account.address) > ending_balance
 
     # Test Transfer Event
     assert len(tx.events) == 1
@@ -104,7 +119,13 @@ def test_claim_token(amount_staked):
     assert tx.events["Transfer"]["to"] == account
     assert (
         tx.events["Transfer"]["value"]
-        == amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
+        == amount_staked
+        * INITIAL_PRICE_FEED_VALUE
+        / 10 ** DECIMALS
+        * staking_time
+        * yieldRate
+        / 1000
+        / 86400
     )
 
 
@@ -158,12 +179,17 @@ def test_add_allowed_tokens():
         weth_token,
         lending_protocol,
     ) = deploy_staking_contract_and_project_token()
-    staking_contract.addAllowedTokens(project_token.address, {"from": account})
+    pricefeed_of_token = get_contract("dai_usd_price_feed")
+    staking_contract.addAllowedTokens(
+        project_token.address, pricefeed_of_token, {"from": account}
+    )
 
     assert staking_contract.allowedTokens(0) == weth_token.address
     assert staking_contract.allowedTokens(1) == project_token.address
     with reverts("Ownable: caller is not the owner"):
-        staking_contract.addAllowedTokens(project_token.address, {"from": non_owner})
+        staking_contract.addAllowedTokens(
+            project_token.address, pricefeed_of_token, {"from": non_owner}
+        )
 
 
 def test_event_TokenAdded():
@@ -176,7 +202,10 @@ def test_event_TokenAdded():
         weth_token,
         lending_protocol,
     ) = deploy_staking_contract_and_project_token()
-    add_tx = staking_contract.addAllowedTokens(project_token.address, {"from": account})
+    pricefeed_of_token = get_contract("dai_usd_price_feed")
+    add_tx = staking_contract.addAllowedTokens(
+        project_token.address, pricefeed_of_token, {"from": account}
+    )
     add_tx.wait(1)
     assert add_tx.events["TokenAdded"] is not None
     assert add_tx.events["TokenAdded"]["token_address"] == project_token.address
@@ -197,7 +226,10 @@ def test_token_is_allowed():
     assert staking_contract.tokenIsAllowed(weth_token.address)
     assert not staking_contract.tokenIsAllowed(project_token)
     assert not staking_contract.tokenIsAllowed(non_owner)
-    staking_contract.addAllowedTokens(project_token.address, {"from": account})
+    pricefeed_of_token = get_contract("dai_usd_price_feed")
+    staking_contract.addAllowedTokens(
+        project_token.address, pricefeed_of_token, {"from": account}
+    )
     assert staking_contract.tokenIsAllowed(project_token)
 
 
@@ -228,7 +260,10 @@ def test_stake_tokens(amount_staked):
         staking_contract.stakeTokens(
             amount_staked, project_token.address, {"from": account}
         )
-    staking_contract.addAllowedTokens(project_token.address, {"from": account})
+    pricefeed_of_token = get_contract("dai_usd_price_feed")
+    staking_contract.addAllowedTokens(
+        project_token.address, pricefeed_of_token, {"from": account}
+    )
     # fails: allowance not approved to transfer
     with reverts("ERC20: transfer amount exceeds allowance"):
         staking_contract.stakeTokens(
@@ -284,9 +319,13 @@ def test_unstake_tokens(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
-    staking_contract, project_token, weth_token, lending_protocol = deploy_and_stake(
-        amount_staked
-    )
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+        lending_protocol,
+        tx,
+    ) = deploy_and_stake(amount_staked)
     initial_balance_contract = weth_token.balanceOf(
         staking_contract.address
     )  # 0 since its on aave
@@ -377,9 +416,13 @@ def test_event_unstake(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
-    staking_contract, project_token, weth_token, lending_protocol = deploy_and_stake(
-        amount_staked
-    )
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+        lending_protocol,
+        tx,
+    ) = deploy_and_stake(amount_staked)
     initial_balance_contract = weth_token.balanceOf(
         staking_contract.address
     )  # 0 since its on aave
@@ -435,9 +478,13 @@ def test_get_user_value(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
-    staking_contract, project_token, weth_token, lending_protocol = deploy_and_stake(
-        amount_staked
-    )
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+        lending_protocol,
+        tx,
+    ) = deploy_and_stake(amount_staked)
 
     user_value = staking_contract.getUserSingleTokenValue(
         account.address, weth_token.address
@@ -448,7 +495,7 @@ def test_get_user_value(amount_staked):
 ## getUserTotalValue
 
 
-def test_get_user_total_value_revert_if_no_stake():
+def test_get_user_total_value_if_no_stake():
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
@@ -459,8 +506,7 @@ def test_get_user_total_value_revert_if_no_stake():
         lending_protocol,
     ) = deploy_staking_contract_and_project_token()
 
-    with reverts(""):
-        staking_contract.getUserTotalValue(account.address)
+    assert staking_contract.getUserTotalValue(account.address) == 0
 
 
 def test_get_user_total_value_with_different_tokens(amount_staked):
@@ -487,8 +533,8 @@ def test_get_user_total_value_with_different_tokens(amount_staked):
     )
     assert user_value_weth == 0
     # revert: No tokens staked!
-    with reverts(""):
-        staking_contract.getUserTotalValue(account.address)
+    # with reverts(""):
+    assert staking_contract.getUserTotalValue(account.address) == 0
 
     # Stake tokens
     stake_and_approve_token(staking_contract, weth_token, amount_staked, account)
@@ -521,9 +567,13 @@ def test_change_lending_protocol(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
-    staking_contract, project_token, weth_token, lending_protocol = deploy_and_stake(
-        amount_staked
-    )
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+        lending_protocol,
+        tx,
+    ) = deploy_and_stake(amount_staked)
 
     assert staking_contract.lendingProtocol() == lending_protocol
 
@@ -547,9 +597,13 @@ def test_event_change_lending_protocol(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
-    staking_contract, project_token, weth_token, lending_protocol = deploy_and_stake(
-        amount_staked
-    )
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+        lending_protocol,
+        tx,
+    ) = deploy_and_stake(amount_staked)
 
     lending_protocol_compound = deploy_compound_lending_contract()
     initial_lending_protocol = staking_contract.lendingProtocol()

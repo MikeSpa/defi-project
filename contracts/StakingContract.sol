@@ -21,8 +21,11 @@ contract StakingContract is Ownable {
     // user -> amount of projectToken they can claimed
     mapping(address => uint256) public tokenToClaim;
     // how much token user can earn per amount of time
-    // token earn = total value [USD] * rewardRate * time period[timestamp]
-    uint256 public rewardRate = 1;
+    // token earn = total value [USD] * yield/1000 * time period[timestamp] / second_in_days
+    // for a yieldRate of 10, user gain 1% of total value [USD] per day
+    uint256 public yieldRate = 10; //TODO mutable + yieldRate[_token]
+    // user => time of last update
+    mapping(address => uint256) public userToUnrealisedYieldTime;
 
     ILendingProtocol public lendingProtocol;
 
@@ -48,24 +51,16 @@ contract StakingContract is Ownable {
     /// @param _token The address of the token
     /// @param _priceFeed The address of the pricefeed
     function setPriceFeedContract(address _token, address _priceFeed)
-        external
+        public
         onlyOwner
     {
         tokenPriceFeedMapping[_token] = _priceFeed;
     }
 
-    /// @notice Increase "ProjectToken" balance `tokenToClaim` for each user according to token staked
-    function issueTokens() external onlyOwner {
-        // Issue tokens to all stakers
-        for (uint256 i = 0; i < stakers.length; i++) {
-            address recipient = stakers[i];
-            uint256 userTotalValue = getUserTotalValue(recipient);
-            tokenToClaim[recipient] += userTotalValue;
-        }
-    }
-
     /// @notice Send Earned "ProjectToken" to user
     function claimToken() external {
+        //Todo update yield per token in stake/unstake and here do it for each token
+        _updateYield(msg.sender);
         uint256 amount = tokenToClaim[msg.sender];
         tokenToClaim[msg.sender] = 0;
         require(projectToken.transfer(msg.sender, amount));
@@ -75,11 +70,10 @@ contract StakingContract is Ownable {
     /// @param _user The address of the user
     /// @return totalValue The total value  of the tokens staked on the contract by _user
     function getUserTotalValue(address _user) public view returns (uint256) {
+        if (uniqueTokensStaked[_user] == 0) {
+            return 0;
+        }
         uint256 totalValue = 0;
-        require(
-            uniqueTokensStaked[_user] > 0,
-            "StakingContract: No tokens staked!"
-        );
         //for any stakable token
         for (uint256 i = 0; i < allowedTokens.length; i++) {
             totalValue += getUserSingleTokenValue(_user, allowedTokens[i]);
@@ -96,9 +90,6 @@ contract StakingContract is Ownable {
         view
         returns (uint256)
     {
-        if (uniqueTokensStaked[_user] <= 0) {
-            return 0;
-        }
         (uint256 price, uint256 decimals) = getTokenValue(_token);
         //TODO
         uint256 tokenValue = ((stakingBalance[_token][_user] * price) /
@@ -108,7 +99,6 @@ contract StakingContract is Ownable {
         // E.G.     10 WETH                      * 3'000(usd/weth)/ 100_000_000
     }
 
-    //
     /// @notice Get the value (in USD) of a _token and its decimals()
     /// @param _token The address of the token
     /// @return price The value of _token
@@ -127,8 +117,26 @@ contract StakingContract is Ownable {
         return (uint256(price), decimals);
     }
 
+    /// @notice Update the tokenToClaim variable of _user
+    /// @param _user The address of the user
+    function _updateYield(address _user) internal {
+        uint256 unrealisedYieldTime = userToUnrealisedYieldTime[_user];
+        userToUnrealisedYieldTime[_user] = block.timestamp;
+
+        uint256 totalValue = getUserTotalValue(_user);
+        uint256 time = block.timestamp - unrealisedYieldTime;
+        uint256 secondsInDay = 86400;
+        //TODO yieldRate[_token]
+        uint256 additionalYield = ((totalValue * time * yieldRate) / 1000) /
+            secondsInDay;
+
+        tokenToClaim[_user] += additionalYield;
+    }
+
     // stake a token
     function stakeTokens(uint256 _amount, address _token) external {
+        _updateYield(msg.sender);
+
         require(_amount > 0, "StakingContract: Amount must be greater than 0");
         require(
             tokenIsAllowed(_token),
@@ -139,6 +147,7 @@ contract StakingContract is Ownable {
             "StakingContract: transferFrom() failed"
         );
         _updateUniqueTokensStaked(msg.sender, _token);
+
         stakingBalance[_token][msg.sender] =
             stakingBalance[_token][msg.sender] +
             _amount;
@@ -155,6 +164,7 @@ contract StakingContract is Ownable {
 
     //unstake a token
     function unstakeTokens(address _token) external {
+        _updateYield(msg.sender);
         uint256 balance = stakingBalance[_token][msg.sender];
         require(balance > 0, "StakingContract: Staking balance already 0!");
         // update contract data
@@ -187,12 +197,16 @@ contract StakingContract is Ownable {
     }
 
     // add a new token to the lpublicist of stable token
-    function addAllowedTokens(address _token) external onlyOwner {
+    function addAllowedTokens(address _token, address _pricefeed)
+        external
+        onlyOwner
+    {
         allowedTokens.push(_token);
         require(
             IERC20(_token).approve(address(lendingProtocol), type(uint256).max),
             "StakingContract: approve() failed"
         );
+        setPriceFeedContract(_token, _pricefeed);
         emit TokenAdded(_token);
     }
 

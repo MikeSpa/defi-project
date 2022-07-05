@@ -82,12 +82,14 @@ def get_aave_lending_pool():
 
 def add_allowed_tokens(staking_contract, pricefeed_of_token, account):
     for token in pricefeed_of_token:
-        add_tx = staking_contract.addAllowedTokens(token.address, {"from": account})
-        add_tx.wait(1)
-        set_tx = staking_contract.setPriceFeedContract(
+        add_tx = staking_contract.addAllowedTokens(
             token.address, pricefeed_of_token[token], {"from": account}
         )
-        set_tx.wait(1)
+        add_tx.wait(1)
+        # set_tx = staking_contract.setPriceFeedContract(
+        #     token.address, pricefeed_of_token[token], {"from": account}
+        # )
+        # set_tx.wait(1)
 
 
 def stake_and_approve_token(staking_contract, token_address, amt, account):
@@ -98,6 +100,7 @@ def stake_and_approve_token(staking_contract, token_address, amt, account):
         {"from": account, "gas_limit": 1_000_000, "allow_revert": True},
     )
     tx.wait(1)
+    return tx
 
 
 def unstake_token(staking_contract, token_address, account):
@@ -119,8 +122,8 @@ def deploy_and_stake(amt=POINT_ONE):
         weth_token,
         lending_protocol,
     ) = deploy_staking_contract_and_project_token()
-    stake_and_approve_token(staking_contract, weth_token, amt, account)
-    return staking_contract, project_token, weth_token, lending_protocol
+    tx = stake_and_approve_token(staking_contract, weth_token, amt, account)
+    return staking_contract, project_token, weth_token, lending_protocol, tx
 
 
 def update_front_end():
