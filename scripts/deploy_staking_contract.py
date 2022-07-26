@@ -83,7 +83,7 @@ def get_aave_lending_pool():
 def add_allowed_tokens(staking_contract, pricefeed_of_token, account):
     for token in pricefeed_of_token:
         add_tx = staking_contract.addAllowedTokens(
-            token.address, pricefeed_of_token[token], {"from": account}
+            token.address, pricefeed_of_token[token], 10, {"from": account}
         )
         add_tx.wait(1)
         # set_tx = staking_contract.setPriceFeedContract(

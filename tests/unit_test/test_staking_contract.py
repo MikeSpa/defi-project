@@ -58,43 +58,25 @@ def test_set_price_feed_contract():
     )
 
 
-# # issueToken
-# def test_issue_token(amount_staked):
-#     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
-#         pytest.skip("Only for local testing!")
-#     account = get_account()
-#     token_farm, project_token, weth_token, lending_protocol = deploy_and_stake(
-#         amount_staked
-#     )
-#     starting_balance_on_contract = token_farm.tokenToClaim(account)
-#     # issue token
-#     token_farm.issueTokens({"from": account})
-#     ending_balance_on_contract = token_farm.tokenToClaim(account)
-#     # check that balance tokenToClaim[account] has increased
-#     assert (
-#         ending_balance_on_contract
-#         == starting_balance_on_contract
-#         + amount_staked * INITIAL_PRICE_FEED_VALUE / 10 ** DECIMALS
-#     )
-
-
 # claimToken
 def test_claim_token(amount_staked):
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
+    # stake WETH
     token_farm, project_token, weth_token, lending_protocol, tx = deploy_and_stake(
         amount_staked
     )
     start_time = tx.timestamp
     starting_balance = project_token.balanceOf(account.address)
-    # token_farm.issueTokens({"from": account})
     time.sleep(5)
     tx = token_farm.claimToken({"from": account})
     end_time = tx.timestamp
     staking_time = end_time - start_time
-    yieldRate = token_farm.yieldRate()
-    # additionalYield = amount_staked * staking_time * yieldRate / 1000 / 86400
+    yieldRate = token_farm.tokenToYieldRate(weth_token)
+    # print(yieldRate)
+    additionalYield = amount_staked * staking_time * yieldRate / 1000 / 86400
+    # print(additionalYield)
     ending_balance = project_token.balanceOf(account.address)
     assert (
         ending_balance
@@ -181,14 +163,14 @@ def test_add_allowed_tokens():
     ) = deploy_staking_contract_and_project_token()
     pricefeed_of_token = get_contract("dai_usd_price_feed")
     staking_contract.addAllowedTokens(
-        project_token.address, pricefeed_of_token, {"from": account}
+        project_token.address, pricefeed_of_token, 0, {"from": account}
     )
 
     assert staking_contract.allowedTokens(0) == weth_token.address
     assert staking_contract.allowedTokens(1) == project_token.address
     with reverts("Ownable: caller is not the owner"):
         staking_contract.addAllowedTokens(
-            project_token.address, pricefeed_of_token, {"from": non_owner}
+            project_token.address, pricefeed_of_token, 0, {"from": non_owner}
         )
 
 
@@ -204,7 +186,7 @@ def test_event_TokenAdded():
     ) = deploy_staking_contract_and_project_token()
     pricefeed_of_token = get_contract("dai_usd_price_feed")
     add_tx = staking_contract.addAllowedTokens(
-        project_token.address, pricefeed_of_token, {"from": account}
+        project_token.address, pricefeed_of_token, 0, {"from": account}
     )
     add_tx.wait(1)
     assert add_tx.events["TokenAdded"] is not None
@@ -228,7 +210,7 @@ def test_token_is_allowed():
     assert not staking_contract.tokenIsAllowed(non_owner)
     pricefeed_of_token = get_contract("dai_usd_price_feed")
     staking_contract.addAllowedTokens(
-        project_token.address, pricefeed_of_token, {"from": account}
+        project_token.address, pricefeed_of_token, 0, {"from": account}
     )
     assert staking_contract.tokenIsAllowed(project_token)
 
@@ -262,7 +244,7 @@ def test_stake_tokens(amount_staked):
         )
     pricefeed_of_token = get_contract("dai_usd_price_feed")
     staking_contract.addAllowedTokens(
-        project_token.address, pricefeed_of_token, {"from": account}
+        project_token.address, pricefeed_of_token, 0, {"from": account}
     )
     # fails: allowance not approved to transfer
     with reverts("ERC20: transfer amount exceeds allowance"):
