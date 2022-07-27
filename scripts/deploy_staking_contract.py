@@ -127,10 +127,10 @@ def deploy_and_stake(amt=POINT_ONE):
 
 
 def update_front_end():
-    # Send the build folder
+    # Send the build folder (e.g. address of projectToken)
     copy_folders_to_front_end("./build", "./front_end/src/chain-info")
 
-    # Sending the front end our config in JSON format
+    # Sending the front end our config in JSON format (e.g. address of dai token)
     with open("brownie-config.yaml", "r") as brownie_config:
         config_dict = yaml.load(brownie_config, Loader=yaml.FullLoader)
         with open("./front_end/src/brownie-config.json", "w") as brownie_config_json:
@@ -145,18 +145,20 @@ def copy_folders_to_front_end(src, dest):
 
 
 def main():
-    account = get_account()
-    front_end_update = False
-    (
-        staking_contract,
-        project_token,
-        weth_token,
-        lending_protocol,
-    ) = deploy_staking_contract_and_project_token(front_end_update)
-    weth_token_address = get_contract("weth_token")
-    staking_contract = StakingContract[-1]
-    stake_and_approve_token(
-        staking_contract, weth_token_address, POINT_ONE / 10, account
-    )
+    # account = get_account()
+    # front_end_update = False
+    # (
+    #     staking_contract,
+    #     project_token,
+    #     weth_token,
+    #     lending_protocol,
+    # ) = deploy_staking_contract_and_project_token(front_end_update)
+    # weth_token_address = get_contract("weth_token")
+    # staking_contract = StakingContract[-1]
+    # stake_and_approve_token(
+    #     staking_contract, weth_token_address, POINT_ONE / 10, account
+    # )
 
-    unstake_token(staking_contract, weth_token_address, account)
+    # unstake_token(staking_contract, weth_token_address, account)
+
+    update_front_end()

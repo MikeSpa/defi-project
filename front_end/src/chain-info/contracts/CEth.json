@@ -79,7 +79,7 @@
     "absolutePath": "contracts/CompoundInteractionContract.sol",
     "exportedSymbols": {
       "Address": [
-        1084
+        1380
       ],
       "CErc20": [
         54
@@ -91,19 +91,19 @@
         361
       ],
       "Context": [
-        710
+        1084
       ],
       "Erc20": [
         22
       ],
       "IERC20": [
-        788
+        1028
       ],
       "Ownable": [
-        465
+        726
       ],
       "SafeERC20": [
-        689
+        950
       ]
     },
     "id": 362,
@@ -128,7 +128,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 362,
-        "sourceUnit": 690,
+        "sourceUnit": 951,
         "src": "58:65:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -140,7 +140,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 362,
-        "sourceUnit": 466,
+        "sourceUnit": 727,
         "src": "124:52:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1097,7 +1097,7 @@
               "id": 83,
               "name": "Ownable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 465,
+              "referencedDeclaration": 726,
               "src": "1010:7:5"
             },
             "id": 84,
@@ -1112,8 +1112,8 @@
         "id": 361,
         "linearizedBaseContracts": [
           361,
-          465,
-          710
+          726,
+          1084
         ],
         "name": "CompoundInteractionContract",
         "nameLocation": "979:27:5",
@@ -4238,7 +4238,7 @@
                   "id": 302,
                   "name": "onlyOwner",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 408,
+                  "referencedDeclaration": 669,
                   "src": "4660:9:5"
                 },
                 "nodeType": "ModifierInvocation",
@@ -4289,7 +4289,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IERC20_$788",
+                        "typeIdentifier": "t_contract$_IERC20_$1028",
                         "typeString": "contract IERC20"
                       },
                       "typeName": {
@@ -4299,13 +4299,13 @@
                           "id": 334,
                           "name": "IERC20",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 788,
+                          "referencedDeclaration": 1028,
                           "src": "4922:6:5"
                         },
-                        "referencedDeclaration": 788,
+                        "referencedDeclaration": 1028,
                         "src": "4922:6:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IERC20_$788",
+                          "typeIdentifier": "t_contract$_IERC20_$1028",
                           "typeString": "contract IERC20"
                         }
                       },
@@ -4339,10 +4339,10 @@
                       "name": "IERC20",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 788,
+                      "referencedDeclaration": 1028,
                       "src": "4937:6:5",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_type$_t_contract$_IERC20_$788_$",
+                        "typeIdentifier": "t_type$_t_contract$_IERC20_$1028_$",
                         "typeString": "type(contract IERC20)"
                       }
                     },
@@ -4357,7 +4357,7 @@
                     "src": "4937:22:5",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IERC20_$788",
+                      "typeIdentifier": "t_contract$_IERC20_$1028",
                       "typeString": "contract IERC20"
                     }
                   },
@@ -4467,7 +4467,7 @@
                             "referencedDeclaration": 336,
                             "src": "4996:5:5",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_IERC20_$788",
+                              "typeIdentifier": "t_contract$_IERC20_$1028",
                               "typeString": "contract IERC20"
                             }
                           },
@@ -4478,7 +4478,7 @@
                           "lValueRequested": false,
                           "memberName": "balanceOf",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 727,
+                          "referencedDeclaration": 967,
                           "src": "4996:15:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
@@ -4520,7 +4520,7 @@
                         "referencedDeclaration": 336,
                         "src": "4969:5:5",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IERC20_$788",
+                          "typeIdentifier": "t_contract$_IERC20_$1028",
                           "typeString": "contract IERC20"
                         }
                       },
@@ -4531,7 +4531,7 @@
                       "lValueRequested": false,
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 737,
+                      "referencedDeclaration": 977,
                       "src": "4969:14:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
@@ -4571,7 +4571,7 @@
                   "id": 331,
                   "name": "onlyOwner",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 408,
+                  "referencedDeclaration": 669,
                   "src": "4902:9:5"
                 },
                 "nodeType": "ModifierInvocation",

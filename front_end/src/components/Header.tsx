@@ -37,6 +37,10 @@ const headersData = [
         href: "/staking",
     },
     {
+        label: "Your Funds",
+        href: "/funds",
+    },
+    {
         label: "Flash Loans",
         href: "/flash-loan",
     },
@@ -44,11 +48,15 @@ const headersData = [
         label: "NFT",
         href: "/nft",
     },
-
     {
-        label: "My Account",
-        href: "/account",
+        label: "FAQ",
+        href: "/faq",
     },
+
+    // {
+    //     label: "My Account",
+    //     href: "/account",
+    // },
 
 ];
 
