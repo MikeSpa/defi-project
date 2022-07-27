@@ -47,7 +47,7 @@ def deploy_staking_contract_and_project_token(front_end_update=False):
     pricefeed_of_token = {
         weth_token: get_contract("eth_usd_price_feed"),
     }
-    add_allowed_tokens(staking_contract, pricefeed_of_token, account)
+    add_allowed_tokens(staking_contract, pricefeed_of_token, 10, account)
     if front_end_update:
         update_front_end()
     return staking_contract, project_token, weth_token, lending_protocol
@@ -80,10 +80,10 @@ def get_aave_lending_pool():
     return lending_pool
 
 
-def add_allowed_tokens(staking_contract, pricefeed_of_token, account):
+def add_allowed_tokens(staking_contract, pricefeed_of_token, yield_rate, account):
     for token in pricefeed_of_token:
         add_tx = staking_contract.addAllowedTokens(
-            token.address, pricefeed_of_token[token], 10, {"from": account}
+            token.address, pricefeed_of_token[token], yield_rate, {"from": account}
         )
         add_tx.wait(1)
         # set_tx = staking_contract.setPriceFeedContract(

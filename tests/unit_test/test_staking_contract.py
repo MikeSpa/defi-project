@@ -95,21 +95,6 @@ def test_claim_token(amount_staked):
     token_farm.claimToken({"from": account})
     assert project_token.balanceOf(account.address) > ending_balance
 
-    # Test Transfer Event
-    assert len(tx.events) == 1
-    assert tx.events["Transfer"]["from"] == token_farm
-    assert tx.events["Transfer"]["to"] == account
-    assert (
-        tx.events["Transfer"]["value"]
-        == amount_staked
-        * INITIAL_PRICE_FEED_VALUE
-        / 10 ** DECIMALS
-        * staking_time
-        * yieldRate
-        / 1000
-        / 86400
-    )
-
 
 # getTokenValue
 def test_get_token_value():
@@ -134,7 +119,7 @@ def test_get_token_value():
     pricefeed_of_token = {
         fau_token: get_contract("dai_usd_price_feed"),
     }
-    add_allowed_tokens(staking_contract, pricefeed_of_token, account)
+    add_allowed_tokens(staking_contract, pricefeed_of_token, 10, account)
     assert staking_contract.getTokenValue(fau_token.address) == (
         INITIAL_PRICE_FEED_VALUE,
         DECIMALS,
@@ -142,7 +127,7 @@ def test_get_token_value():
     pricefeed_of_token = {
         project_token: get_contract("dai_usd_price_feed"),
     }
-    add_allowed_tokens(staking_contract, pricefeed_of_token, account)
+    add_allowed_tokens(staking_contract, pricefeed_of_token, 10, account)
     assert staking_contract.getTokenValue(project_token.address) == (
         INITIAL_PRICE_FEED_VALUE,
         DECIMALS,
@@ -172,25 +157,6 @@ def test_add_allowed_tokens():
         staking_contract.addAllowedTokens(
             project_token.address, pricefeed_of_token, 0, {"from": non_owner}
         )
-
-
-def test_event_TokenAdded():
-    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
-        pytest.skip("Only for local testing!")
-    account = get_account()
-    (
-        staking_contract,
-        project_token,
-        weth_token,
-        lending_protocol,
-    ) = deploy_staking_contract_and_project_token()
-    pricefeed_of_token = get_contract("dai_usd_price_feed")
-    add_tx = staking_contract.addAllowedTokens(
-        project_token.address, pricefeed_of_token, 0, {"from": account}
-    )
-    add_tx.wait(1)
-    assert add_tx.events["TokenAdded"] is not None
-    assert add_tx.events["TokenAdded"]["token_address"] == project_token.address
 
 
 # tokenIsAllowed
@@ -242,10 +208,10 @@ def test_stake_tokens(amount_staked):
         staking_contract.stakeTokens(
             amount_staked, project_token.address, {"from": account}
         )
-    pricefeed_of_token = get_contract("dai_usd_price_feed")
-    staking_contract.addAllowedTokens(
-        project_token.address, pricefeed_of_token, 0, {"from": account}
-    )
+    pricefeed_of_token: dict = {
+        project_token: get_contract("dai_usd_price_feed"),
+    }
+    add_allowed_tokens(staking_contract, pricefeed_of_token, 10, account)
     # fails: allowance not approved to transfer
     with reverts("ERC20: transfer amount exceeds allowance"):
         staking_contract.stakeTokens(
@@ -272,26 +238,6 @@ def test_stake_tokens_fails_if_not_positive_amt(amount_staked):
 
     with reverts("StakingContract: Amount must be greater than 0"):
         staking_contract.stakeTokens(0, weth_token.address, {"from": account})
-
-
-def test_event_token_staked(amount_staked):
-    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
-        pytest.skip("Only for local testing!")
-    account = get_account()
-    (
-        staking_contract,
-        project_token,
-        weth_token,
-        lending_protocol,
-    ) = deploy_staking_contract_and_project_token()
-    weth_token.approve(staking_contract.address, amount_staked, {"from": account})
-
-    stake_tx = staking_contract.stakeTokens(
-        amount_staked, weth_token.address, {"from": account}
-    )
-    assert stake_tx.events["TokenStaked"]["token"] == weth_token
-    assert stake_tx.events["TokenStaked"]["staker"] == account
-    assert stake_tx.events["TokenStaked"]["amount"] == amount_staked
 
 
 # unstakeTokens
@@ -394,28 +340,6 @@ def test_unstake_token_multiple_stakers(amount_staked):
     assert staking_contract.uniqueTokensStaked(acc2.address) == 0
 
 
-def test_event_unstake(amount_staked):
-    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
-        pytest.skip("Only for local testing!")
-    account = get_account()
-    (
-        staking_contract,
-        project_token,
-        weth_token,
-        lending_protocol,
-        tx,
-    ) = deploy_and_stake(amount_staked)
-    initial_balance_contract = weth_token.balanceOf(
-        staking_contract.address
-    )  # 0 since its on aave
-
-    unstake_tx = staking_contract.unstakeTokens(weth_token.address, {"from": account})
-
-    assert unstake_tx.events["TokenUnstaked"]["token"] == weth_token
-    assert unstake_tx.events["TokenUnstaked"]["staker"] == account
-    assert unstake_tx.events["TokenUnstaked"]["amount"] == amount_staked
-
-
 # Ownable
 def test_transfer_ownership():
     (
@@ -509,7 +433,7 @@ def test_get_user_total_value_with_different_tokens(amount_staked):
         fau_token: get_contract("dai_usd_price_feed"),
         project_token: get_contract("dai_usd_price_feed"),
     }
-    add_allowed_tokens(staking_contract, pricefeed_of_token, account)
+    add_allowed_tokens(staking_contract, pricefeed_of_token, 10, account)
     user_value_weth = staking_contract.getUserSingleTokenValue(
         account.address, weth_token.address
     )
@@ -575,7 +499,7 @@ def test_change_lending_protocol(amount_staked):
         )
 
 
-def test_event_change_lending_protocol(amount_staked):
+def test_update_yield():
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip("Only for local testing!")
     account = get_account()
@@ -584,23 +508,14 @@ def test_event_change_lending_protocol(amount_staked):
         project_token,
         weth_token,
         lending_protocol,
-        tx,
-    ) = deploy_and_stake(amount_staked)
+    ) = deploy_staking_contract_and_project_token()
+    pricefeed_of_token: dict = {
+        project_token: get_contract("dai_usd_price_feed"),
+    }
+    add_allowed_tokens(staking_contract, pricefeed_of_token, 0, account)
 
-    lending_protocol_compound = deploy_compound_lending_contract()
-    initial_lending_protocol = staking_contract.lendingProtocol()
-    tx = staking_contract.changeLendingProtocol(lending_protocol_compound)
-    assert (
-        tx.events["LendingProtocolChanged"]["newProtocol"] == lending_protocol_compound
-    )
-    assert (
-        tx.events["LendingProtocolChanged"]["oldProtocol"] == initial_lending_protocol
-    )
+    assert staking_contract.tokenToYieldRate(project_token) == 0
 
-    lending_protocol_aave = deploy_aave_lending_contract()
-    tx = staking_contract.changeLendingProtocol(lending_protocol_aave)
+    staking_contract.updateYieldRate(project_token, 42)
 
-    assert tx.events["LendingProtocolChanged"]["newProtocol"] == lending_protocol_aave
-    assert (
-        tx.events["LendingProtocolChanged"]["oldProtocol"] == lending_protocol_compound
-    )
+    assert staking_contract.tokenToYieldRate(project_token) == 42

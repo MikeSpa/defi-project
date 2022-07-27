@@ -44,6 +44,8 @@ contract StakingContract is Ownable {
     );
     event LendingProtocolChanged(address newProtocol, address oldProtocol);
 
+    event YieldRateChange(address indexed token, uint256 newYield);
+
     // CONSTRUCTOR
     constructor(address _projectTokenAddress, address _lendingProtocol) {
         projectToken = IERC20(_projectTokenAddress);
@@ -236,6 +238,7 @@ contract StakingContract is Ownable {
         }
         //update yield
         tokenToYieldRate[_token] = _newYieldRate;
+        emit YieldRateChange(_token, _newYieldRate);
     }
 
     /// @notice Change the lending protocol
