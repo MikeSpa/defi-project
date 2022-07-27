@@ -5,7 +5,7 @@ from scripts.deploy_aave_lending_contract import deploy_aave_lending_contract
 from scripts.deploy_compound_lending import deploy_compound_lending_contract
 from scripts.deploy_staking_contract import (
     deploy_staking_contract_and_project_token,
-    deploy_and_stake,
+    deploy_and_stake_weth,
 )
 from scripts.helpful_scripts import (
     LOCAL_BLOCKCHAIN_ENVIRONMENTS,
@@ -25,7 +25,7 @@ def test_transfer_event(amount_staked):
         pytest.skip("Only for local testing!")
     account = get_account()
     # stake WETH
-    token_farm, project_token, weth_token, lending_protocol, tx = deploy_and_stake(
+    token_farm, project_token, weth_token, lending_protocol, tx = deploy_and_stake_weth(
         amount_staked
     )
     start_time = tx.timestamp
@@ -118,7 +118,7 @@ def test_event_unstake(amount_staked):
         weth_token,
         lending_protocol,
         tx,
-    ) = deploy_and_stake(amount_staked)
+    ) = deploy_and_stake_weth(amount_staked)
 
     unstake_tx = staking_contract.unstakeTokens(weth_token.address, {"from": account})
 
@@ -137,7 +137,7 @@ def test_event_change_lending_protocol(amount_staked):
         weth_token,
         lending_protocol,
         tx,
-    ) = deploy_and_stake(amount_staked)
+    ) = deploy_and_stake_weth(amount_staked)
 
     lending_protocol_compound = deploy_compound_lending_contract()
     initial_lending_protocol = staking_contract.lendingProtocol()

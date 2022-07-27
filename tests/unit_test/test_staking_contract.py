@@ -11,9 +11,9 @@ from scripts.helpful_scripts import (
 )
 import pytest
 from scripts.deploy_staking_contract import (
-    add_allowed_tokens,
     deploy_staking_contract_and_project_token,
-    deploy_and_stake,
+    deploy_and_stake_weth,
+    add_allowed_tokens,
     stake_and_approve_token,
 )
 import time
@@ -64,7 +64,7 @@ def test_claim_token(amount_staked):
         pytest.skip("Only for local testing!")
     account = get_account()
     # stake WETH
-    token_farm, project_token, weth_token, lending_protocol, tx = deploy_and_stake(
+    token_farm, project_token, weth_token, lending_protocol, tx = deploy_and_stake_weth(
         amount_staked
     )
     start_time = tx.timestamp
@@ -253,7 +253,7 @@ def test_unstake_tokens(amount_staked):
         weth_token,
         lending_protocol,
         tx,
-    ) = deploy_and_stake(amount_staked)
+    ) = deploy_and_stake_weth(amount_staked)
     initial_balance_contract = weth_token.balanceOf(
         staking_contract.address
     )  # 0 since its on aave
@@ -390,7 +390,7 @@ def test_get_user_value(amount_staked):
         weth_token,
         lending_protocol,
         tx,
-    ) = deploy_and_stake(amount_staked)
+    ) = deploy_and_stake_weth(amount_staked)
 
     user_value = staking_contract.getUserSingleTokenValue(
         account.address, weth_token.address
@@ -479,7 +479,7 @@ def test_change_lending_protocol(amount_staked):
         weth_token,
         lending_protocol,
         tx,
-    ) = deploy_and_stake(amount_staked)
+    ) = deploy_and_stake_weth(amount_staked)
 
     assert staking_contract.lendingProtocol() == lending_protocol
 

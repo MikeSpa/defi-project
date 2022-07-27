@@ -10,10 +10,6 @@ from scripts.helpful_scripts import (
 from brownie import (
     ProjectToken,
     StakingContract,
-    AaveLending,
-    config,
-    network,
-    interface,
 )
 
 import yaml
@@ -23,13 +19,26 @@ import shutil
 
 
 def deploy_staking_contract_and_project_token(front_end_update=False):
+    """
+    Deploy the ERC20 token: ProjectToken.
+    Deploy the StakingContract.
+    Deploy the AaveLending contract.
+    Add WETH to the list of allowed token.
+    Update the front end if front_end_update=True
+    """
     account = get_account()
+
+    # Deploy ProjectToken
     project_token = ProjectToken.deploy(
         {"from": account},
         # publish_source=get_verify_status(),
         publish_source=False,
     )
+
+    # Deploy AaveLending
     lending_protocol = deploy_aave_lending_contract()
+
+    # Deploy StakingContract
     staking_contract = StakingContract.deploy(
         project_token.address,
         lending_protocol,
@@ -41,80 +50,30 @@ def deploy_staking_contract_and_project_token(front_end_update=False):
         staking_contract.address, project_token.totalSupply() - CENT, {"from": account}
     )
     tx.wait(1)
+
+    # Allow WETH
     ## address of Mock or real ERC20 token contract
     weth_token = get_contract("weth_token")
-    # {address -> pricefeed} | pricefeed = MockAggregator or real agg
+    ## {address -> pricefeed} | pricefeed = MockAggregator or real agg
     pricefeed_of_token = {
         weth_token: get_contract("eth_usd_price_feed"),
     }
     add_allowed_tokens(staking_contract, pricefeed_of_token, 10, account)
+
+    # Front End
     if front_end_update:
         update_front_end()
     return staking_contract, project_token, weth_token, lending_protocol
 
 
-def deploy_aave_lending_protocol():
-    if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
-        aave_lending_protocol = get_contract("lending_pool")
-        return aave_lending_protocol
-    account = get_account()
-    aave_lending_protocol = AaveLending.deploy(
-        get_aave_lending_pool(),
-        {"from": account},
-        # publish_source=get_verify_status(),
-        publish_source=False,
-    )
-    return aave_lending_protocol
-
-
-def get_aave_lending_pool():
-    # return the address of the aave lending pool
-    if network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
-        lending_pool = get_contract("lending_pool")
-    else:
-        lending_pool_addresses_provider = interface.ILendingPoolAddressesProvider(
-            config["networks"][network.show_active()]["lending_pool_addresses_provider"]
-        )
-        lending_pool_address = lending_pool_addresses_provider.getLendingPool()
-        lending_pool = interface.ILendingPool(lending_pool_address)
-    return lending_pool
-
-
-def add_allowed_tokens(staking_contract, pricefeed_of_token, yield_rate, account):
-    for token in pricefeed_of_token:
-        add_tx = staking_contract.addAllowedTokens(
-            token.address, pricefeed_of_token[token], yield_rate, {"from": account}
-        )
-        add_tx.wait(1)
-        # set_tx = staking_contract.setPriceFeedContract(
-        #     token.address, pricefeed_of_token[token], {"from": account}
-        # )
-        # set_tx.wait(1)
-
-
-def stake_and_approve_token(staking_contract, token_address, amt, account):
-    token_address.approve(staking_contract, amt, {"from": account})
-    tx = staking_contract.stakeTokens(
-        amt,
-        token_address,
-        {"from": account, "gas_limit": 1_000_000, "allow_revert": True},
-    )
-    tx.wait(1)
-    return tx
-
-
-def unstake_token(staking_contract, token_address, account):
-    tx = staking_contract.unstakeTokens(token_address, {"from": account})
-    tx.wait(1)
-
-
-def issue_tokens(stacking_contract, account):
-    account = get_account()
-    tx = stacking_contract.issueTokens({"from": account})
-    tx.wait(1)
-
-
-def deploy_and_stake(amt=POINT_ONE):
+def deploy_and_stake_weth(amt=POINT_ONE):
+    """
+    Deploy the ERC20 token: ProjectToken.
+    Deploy the StakingContract.
+    Deploy the AaveLending contract.
+    Add WETH to the list of allowed token.
+    Stake amt of WETH on the StakingContract.
+    """
     account = get_account()
     (
         staking_contract,
@@ -126,7 +85,42 @@ def deploy_and_stake(amt=POINT_ONE):
     return staking_contract, project_token, weth_token, lending_protocol, tx
 
 
+### HELPER functions to interact with the contract
+
+
+def add_allowed_tokens(staking_contract, pricefeed_of_token, yield_rate, account):
+    """
+    Add several token to the approved token list of the contract.
+    """
+    for token in pricefeed_of_token:
+        add_tx = staking_contract.addAllowedTokens(
+            token.address, pricefeed_of_token[token], yield_rate, {"from": account}
+        )
+    last_tx = add_tx
+    return last_tx
+
+
+def stake_and_approve_token(staking_contract, token_address, amt, account):
+    """
+    Stake a given amount of token after having approve the transfer to the staking contract.
+    """
+    token_address.approve(staking_contract, amt, {"from": account})
+    tx = staking_contract.stakeTokens(
+        amt,
+        token_address,
+        {"from": account, "gas_limit": 1_000_000, "allow_revert": True},
+    )
+    tx.wait(1)
+    return tx
+
+
+### FRONT END
+
+
 def update_front_end():
+    """
+    Copy the neccessary information from the backend to the front end
+    """
     # Send the build folder (e.g. address of projectToken)
     copy_folders_to_front_end("./build", "./front_end/src/chain-info")
 
@@ -139,9 +133,15 @@ def update_front_end():
 
 
 def copy_folders_to_front_end(src, dest):
+    """
+    Copy folders
+    """
     if os.path.exists(dest):
         shutil.rmtree(dest)
     shutil.copytree(src, dest)
+
+
+### MAIN
 
 
 def main():
@@ -161,4 +161,5 @@ def main():
 
     # unstake_token(staking_contract, weth_token_address, account)
 
-    update_front_end()
+    # update_front_end()
+    pass
