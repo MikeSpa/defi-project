@@ -6,6 +6,8 @@ Staking Dapp with front-end that allows users to stake various ERC20 tokens and 
 - Staking contract: `StakingContract.sol`
 - Interface to interact with lending protocol: `ILendingProtocol`
 - Implementation of that interface for Aave and Compound.
+- Unit tests for every functions
+- Integrations test on Kovan testnet
 
 
 ## TODO

@@ -150,6 +150,13 @@ def get_verify_status():
     return verify
 
 
+def distribute_token(token_address, n=3):
+    account = get_account()
+    erc20 = interface.IERC20(token_address)
+    for i in range(n):
+        erc20.transfer(get_account(index=i + 1), ONE, {"from": account})
+
+
 def main():
     get_asset_price(get_contract("dai_eth_price_feed"))
     pass

@@ -229,8 +229,8 @@ contract StakingContract is Ownable {
         public
         onlyOwner
     {
-        //for all staker who staked _token, we calculate the amount they can claim with the previous yield
-        //before updateing the yield
+        //for all staker who have _token staked, we calculate the amount they can claim with the previous yield
+        //before updating the yield
         for (uint256 i = 0; i < stakers.length; i++) {
             if (stakingBalance[_token][stakers[i]] > 0) {
                 _updateOneTokenToClaim(stakers[i], _token);
