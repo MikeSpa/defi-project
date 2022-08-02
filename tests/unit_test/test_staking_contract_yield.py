@@ -672,7 +672,7 @@ def test_tokenToClaim_three_user_weth_dai_and_project_token():
     update_weth_tx_timestamp = update_weth_tx.timestamp
 
     # t=15
-    # WETH YieldRate change to 20
+    # DAI YieldRate change to 45
     time.sleep(4)
     update_dai_tx = staking_contract.updateYieldRate(dai_token, 45, {"from": account})
     update_dai_tx_timestamp = update_dai_tx.timestamp

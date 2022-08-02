@@ -172,6 +172,13 @@ def cal_yield(amount, time, yield_rate):
     )
 
 
+def print_balance(users: list, tokens: list):
+    """Helper functions that prints the balance for a list of users for a list of tokens"""
+    for token in tokens:
+        for user in users:
+            print(f"{token}: {token.balanceOf(user)}")
+
+
 def main():
     get_asset_price(get_contract("dai_eth_price_feed"))
     pass
