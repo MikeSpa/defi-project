@@ -12,6 +12,8 @@ from brownie import (
 )
 from web3 import Web3
 
+import math
+
 FORKED_LOCAL_ENVIRNOMENT = ["mainnet-fork", "mainnet-fork2"]
 LOCAL_BLOCKCHAIN_ENVIRONMENTS = ["development", "ganache-local", "hardhat"]
 
@@ -155,6 +157,19 @@ def distribute_token(token_address, n=3, amt=ONE):
     erc20 = interface.IERC20(token_address)
     for i in range(n):
         erc20.transfer(get_account(index=i + 1), amt, {"from": account})
+
+
+def cal_yield(amount, time, yield_rate):
+    """Calculate the yield from an amount of token staked during a given time at a given yield_rate"""
+    return math.floor(
+        amount
+        * INITIAL_PRICE_FEED_VALUE
+        / 10 ** DECIMALS
+        * time
+        * yield_rate
+        / 1000
+        / 86400
+    )
 
 
 def main():

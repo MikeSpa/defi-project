@@ -8,6 +8,9 @@ from scripts.helpful_scripts import (
     get_account,
     get_contract,
     CENT,
+    POINT_ONE,
+    ONE,
+    cal_yield,
 )
 import pytest
 from scripts.deploy_staking_contract import (
@@ -497,6 +500,81 @@ def test_change_lending_protocol(amount_staked):
         staking_contract.changeLendingProtocol(
             lending_protocol_aave, {"from": get_account(1)}
         )
+
+
+def test_change_lending_protocol_while_funds_are_deposited_there(amount_staked):
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("Only for local testing!")
+    account = get_account()
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+        lending_protocol,
+    ) = deploy_staking_contract_and_project_token()
+
+    weth_staked = POINT_ONE
+    init_weth_balance_account = weth_token.balanceOf(account)
+    # print(init_weth_balance_account)
+    init_weth_balance_contract = weth_token.balanceOf(staking_contract)
+    init_staking_balance_account = staking_contract.stakingBalance(weth_token, account)
+
+    assert init_weth_balance_contract == 0
+    assert init_staking_balance_account == 0
+
+    # 1st STAKE 0.1 WETH for 14 sec on Aave then transfer to Compound
+    stake_and_approve_token(staking_contract, weth_token, weth_staked, account)
+    assert weth_token.balanceOf(account) == init_weth_balance_account - weth_staked
+    assert weth_token.balanceOf(staking_contract) == 0
+    assert staking_contract.stakingBalance(weth_token, account) == weth_staked
+
+    # Change lending protocole fomr Aave to Compound
+    time.sleep(14)
+    compound_lending = deploy_compound_lending_contract()
+    staking_contract.changeLendingProtocol(compound_lending)
+    assert staking_contract.lendingProtocol() == compound_lending
+
+    assert weth_token.balanceOf(account) == init_weth_balance_account - weth_staked
+    assert weth_token.balanceOf(staking_contract) == 0
+    assert staking_contract.stakingBalance(weth_token, account) == weth_staked
+
+    # Unstake 0.1 WETH
+    time.sleep(7)
+    staking_contract.unstakeTokens(weth_token, {"from": account})
+
+    assert weth_token.balanceOf(account) == init_weth_balance_account
+    assert weth_token.balanceOf(staking_contract) == init_weth_balance_contract
+    assert (
+        staking_contract.stakingBalance(weth_token, account)
+        == init_staking_balance_account
+    )
+
+    # Reverse: compound to aave
+    # 1st STAKE 0.1 WETH for 14 sec on Compound then transfer to Aave
+    stake_and_approve_token(staking_contract, weth_token, weth_staked, account)
+    assert weth_token.balanceOf(account) == init_weth_balance_account - weth_staked
+    assert weth_token.balanceOf(staking_contract) == 0
+    assert staking_contract.stakingBalance(weth_token, account) == weth_staked
+
+    # Change lending protocole fomr Aave to Compound
+    time.sleep(5)
+    staking_contract.changeLendingProtocol(lending_protocol)
+    assert staking_contract.lendingProtocol() == lending_protocol
+
+    assert weth_token.balanceOf(account) == init_weth_balance_account - weth_staked
+    assert weth_token.balanceOf(staking_contract) == 0
+    assert staking_contract.stakingBalance(weth_token, account) == weth_staked
+
+    # Unstake 0.1 WETH
+    time.sleep(5)
+    staking_contract.unstakeTokens(weth_token, {"from": account})
+
+    assert weth_token.balanceOf(account) == init_weth_balance_account
+    assert weth_token.balanceOf(staking_contract) == init_weth_balance_contract
+    assert (
+        staking_contract.stakingBalance(weth_token, account)
+        == init_staking_balance_account
+    )
 
 
 def test_update_yield():

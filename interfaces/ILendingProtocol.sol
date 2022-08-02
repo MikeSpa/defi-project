@@ -38,8 +38,8 @@ interface ILendingProtocol {
     ) external returns (uint256);
 
     /**
-     * @notice Drain all the token od address _token
-     * @param _token The address of the token to be deposited
+     * @notice Drain all the token of address _token
+     * @param _token The address of the token we want to drain
      */
     function drainToken(address _token) external;
 }
