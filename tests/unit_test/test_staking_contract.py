@@ -243,6 +243,23 @@ def test_stake_tokens_fails_if_not_positive_amt(amount_staked):
         staking_contract.stakeTokens(0, weth_token.address, {"from": account})
 
 
+def test_stake_tokens_fails_if_stake_more_than_balance():
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip("Only for local testing!")
+    account = get_account()
+    (
+        staking_contract,
+        project_token,
+        weth_token,
+        lending_protocol,
+    ) = deploy_staking_contract_and_project_token()
+    balance = weth_token.balanceOf(account)
+    weth_token.approve(staking_contract.address, balance + 1, {"from": account})
+
+    with reverts("ERC20: transfer amount exceeds balance"):
+        staking_contract.stakeTokens(balance + 1, weth_token.address, {"from": account})
+
+
 # unstakeTokens
 
 

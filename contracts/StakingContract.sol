@@ -125,7 +125,10 @@ contract StakingContract is Ownable {
         _updateTokenToClaim(msg.sender);
         uint256 amount = tokenToClaim[msg.sender];
         tokenToClaim[msg.sender] = 0;
-        require(projectToken.transfer(msg.sender, amount));
+        require(
+            projectToken.transfer(msg.sender, amount),
+            "StakingContract: transfer failed"
+        );
     }
 
     /// @notice Check wheter a token is stakable on this contract
