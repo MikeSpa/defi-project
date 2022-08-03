@@ -3,7 +3,7 @@
 Staking Dapp with front-end that allows users to stake various ERC20 tokens and earn a yield in a custom token `ProjectToken`. The contract interact with Aave and Compound to deposit the token received from the users and earn a yield.
 
 - ERC20 Token: `ProjectToken.sol`
-- Staking contract: `StakingContract.sol`
+- Staking contract: `StakingContract.sol`, current version on kovan: 0x31d314c0eC0A3d78Ce559D575DB2072334d5F354
 - Interface to interact with lending protocol: `ILendingProtocol`
 - Implementation of that interface for Aave and Compound.
 - Unit tests for every functions

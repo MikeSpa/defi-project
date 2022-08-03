@@ -31,6 +31,7 @@ contract CompoundLending is ILendingProtocol, Ownable {
     }
 
     constructor(address _dai, address _cDAI) {
+        stakingContract = msg.sender;
         tokenToCtoken[_dai] = _cDAI;
     }
 

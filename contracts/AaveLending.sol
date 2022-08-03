@@ -19,6 +19,7 @@ contract AaveLending is ILendingProtocol, Ownable {
     }
 
     constructor(address _pool) {
+        stakingContract = msg.sender;
         pool = ILendingPool(_pool);
     }
 
