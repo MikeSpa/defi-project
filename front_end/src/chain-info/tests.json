@@ -7,12 +7,12 @@
     "FlashLender": "39cc2e967844e10b28f865ee03fdfa0d1b861fd3",
     "MockDAI": "e1547b4af859d343fcb01e05e90ff477bd7b7a7d",
     "MockERC20": "a76a17e80ec61ec18ed8fd4f87a9ed109849a985",
-    "MockLendingPool": "26033ba0733936ea3f7cf5372bfc96f6eaa49493",
+    "MockLendingPool": "4bed59fb53a63b4c7490000b44d84aa11e4d35a6",
     "MockV3Aggregator": "9e734e161b5cafcca52a917f10266f5a8bc05b28",
     "MockWETH": "f33c4f109e739e9750f8a38bb304d466081a6682",
     "OpenZeppelin/openzeppelin-contracts@4.2.0/ERC20": "5c27d7156fdbfe889902cc167df697405a50ad20",
     "ProjectToken": "8f9b49465d6ec6e484d95a2711c15034d8880ad4",
-    "StakingContract": "5c9c3d7f0643c927fe103044bc36aae6e6f57f44",
+    "StakingContract": "54fde36097def9ba4b215ccb255c290a6ac7bc6f",
     "Uniswap": "cb6fcbbc56da223e605a29fcf99e450feafb0a00"
   },
   "tests": {
@@ -20,28 +20,28 @@
       "coverage": false,
       "isolated": false,
       "results": "s",
-      "sha1": "c3b3c2ff61fa938bdf574cb0dc608c11d7d97f00",
+      "sha1": "1e7c3124c96970647d69e77edb52510e91c08672",
       "txhash": []
     },
     "tests/test_compound_lending_integration.py": {
       "coverage": false,
       "isolated": false,
       "results": "s",
-      "sha1": "220685814887ed2387fd92a1785ffd15099e65c2",
+      "sha1": "c79c5ce1605c88957fe4d59587b6f1f9b484fce6",
       "txhash": []
     },
     "tests/test_staking_contract_integration.py": {
       "coverage": false,
       "isolated": false,
       "results": "ss",
-      "sha1": "ab37d7cb787e9b87ee9223384b0ba5be439c3387",
+      "sha1": "c1b5f0930e75059f2fa8bb3931fc0e65cc88f60a",
       "txhash": []
     },
     "tests/unit_test/test_flash_loan.py": {
       "coverage": false,
       "isolated": false,
       "results": ".............",
-      "sha1": "6db8e34c6a809d60c52f3ac4e5c3a91a52e0a442",
+      "sha1": "2ab2878c3ef2adacc0197e3997c6c9ba0d1932b7",
       "txhash": [
         "2ad1e21a71ca25f894729553ad03246fd626c8ce",
         "bc64f33d5a28c08276cb3e8933090d2540793b66",
@@ -52,60 +52,98 @@
       "coverage": false,
       "isolated": false,
       "results": "...",
-      "sha1": "8d36075028ce78589f02c0cc043aa684b0673745",
+      "sha1": "0db215713ee04a6c9b189f0752fd2d350baf00b8",
       "txhash": []
     },
     "tests/unit_test/test_staking_contract.py": {
       "coverage": false,
       "isolated": false,
-      "results": ".....................",
-      "sha1": "ddb7ce453ad11954def1f3ea95a5607f7f011c4d",
+      "results": "....................",
+      "sha1": "27db1ff9ad02f0ea3c27226158c1f498b9fc921a",
       "txhash": [
-        "0b67fe540112858b3c4b44ce0b54789440890be6",
-        "2e5adf79e56b52e8050b8b3c0de61bfb1188928b",
-        "a28e16e4bc336d4406f9055639093dfe483c07d0",
-        "c3b3b395ef414ebc929d9e0a64d8469666757806",
-        "d1978866d3f26dd00d59f1b7377d0d994c99f945",
+        "892848eed218207ff1a28ef7ff6ec3a38e9bd8ec",
+        "8fb2736e042346efa4a7b474fc4eade92b7033fb",
+        "a7e0738467b691f434f36f83969a8066bad5d144",
+        "b1d87fdab828bb1ab4ccdafeffbb1432925111ab",
+        "bc52b2cccf1096b85e7c8fe89e368a3161e4c2ca",
+        "c279cc8943751138d83afc7624b797a544cdb1ba",
+        "c521b630fdd2c7dc8b57a46725ebddea47748f8f",
         "d52a3c8e9d8704a533abe1ac029965de2fcca434",
         "d62a893785c92409daa8a460b7c82dea61076701",
-        "f04379cb73bbbf95d277171e023922f361c3fad7",
-        "f33e2c54a7c478dd4053c887496cb7e17f1a1d5b"
+        "ee7aaf26afa46a14bd30b05ad96ada723b20601c"
       ]
+    },
+    "tests/unit_test/test_staking_contract_event.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": "......",
+      "sha1": "cb82fa28759b908a612fe014685c62cf3914ce5e",
+      "txhash": []
+    },
+    "tests/unit_test/test_staking_contract_hypothesis.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": "F",
+      "sha1": "23dece87080f5bc6f9b0618046af2ff09425e081",
+      "txhash": []
+    },
+    "tests/unit_test/test_staking_contract_yield.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": "........",
+      "sha1": "74dd5b257b69f2b41f0e960d5a18327af6813265",
+      "txhash": []
     },
     "tests/unit_test/test_token.py": {
       "coverage": false,
       "isolated": false,
       "results": "..............",
-      "sha1": "0db62bffe94a58502c37848f65a2933a2240d31a",
+      "sha1": "105376fa8e52ef2fa4bb24ef4685c135f5f974d1",
       "txhash": [
-        "1c77923bea0f4c1b843c48fb33cd90e658857790",
-        "492c95ca8889c6052e1ad28d60816b58c0de5d98",
-        "75c83d6f84e2a74dbfe1fbc67f256a475096d5c7",
-        "8dceeebb6972c9e23af41e86fb82f238ad03b3c8",
-        "aad70bf609607ba1f5bf9ee4fe642657eea247b6"
+        "2352e22f646053bc6c42cd31ba6a29ad32559947",
+        "268a995b48865801813ea81b6ec0eb7b3c64be52",
+        "e713509e05721ab8cc6845eaae03cdc5750bcd2d",
+        "ed457cf05962dc57d69d7c24bf9411e6f4c00cfa",
+        "f578234aca6605bb1ab33e6c9a9787f3f26aa410"
       ]
     }
   },
   "tx": {
-    "0b67fe540112858b3c4b44ce0b54789440890be6": {
-      "StakingContract": {
-        "0": [
+    "2352e22f646053bc6c42cd31ba6a29ad32559947": {
+      "ProjectToken": {
+        "1": [
+          [
+            8,
+            9,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27
+          ],
+          [
+            28
+          ],
+          [
+            32,
+            33,
+            34
+          ]
+        ],
+        "6": [
           [],
           [],
           []
         ],
-        "8": [
-          [
-            7
-          ],
-          [
-            60
-          ],
+        "9": [
+          [],
+          [],
           []
         ]
       }
     },
-    "1c77923bea0f4c1b843c48fb33cd90e658857790": {
+    "268a995b48865801813ea81b6ec0eb7b3c64be52": {
       "ProjectToken": {
         "1": [
           [
@@ -168,109 +206,85 @@
         ]
       }
     },
-    "2e5adf79e56b52e8050b8b3c0de61bfb1188928b": {
+    "892848eed218207ff1a28ef7ff6ec3a38e9bd8ec": {
       "StakingContract": {
         "0": [
-          [
-            48
-          ],
-          [
-            72
-          ],
-          []
-        ],
-        "4": [
           [],
           [],
           []
         ],
         "8": [
-          [],
-          [],
-          []
-        ]
-      }
-    },
-    "492c95ca8889c6052e1ad28d60816b58c0de5d98": {
-      "ProjectToken": {
-        "1": [
           [
-            17,
-            22,
-            23
+            7,
+            8,
+            45,
+            46
           ],
           [
-            33
+            62
           ],
           [
-            32
+            61,
+            70
           ]
-        ],
-        "6": [
-          [],
-          [],
-          []
-        ],
-        "9": [
-          [],
-          [],
-          []
         ]
       }
     },
-    "75c83d6f84e2a74dbfe1fbc67f256a475096d5c7": {
-      "ProjectToken": {
-        "1": [
+    "8fb2736e042346efa4a7b474fc4eade92b7033fb": {
+      "MockV3Aggregator": {
+        "3": [
           [
             14
           ],
-          [
-            29
-          ],
-          []
-        ],
-        "6": [
-          [],
-          [],
-          []
-        ],
-        "9": [
-          [],
           [],
           []
         ]
-      }
-    },
-    "8dceeebb6972c9e23af41e86fb82f238ad03b3c8": {
-      "ProjectToken": {
+      },
+      "MockWETH": {
         "1": [
           [
-            5,
-            18,
-            19
+            8,
+            22,
+            23,
+            24
           ],
           [
-            31
+            34
           ],
           [
-            30
+            32,
+            33
           ]
         ],
-        "6": [
-          [
-            6
-          ],
-          [],
-          []
-        ],
-        "9": [
+        "11": [
           [],
           [],
           []
         ]
+      },
+      "StakingContract": {
+        "8": [
+          [
+            7,
+            8,
+            9,
+            10,
+            44,
+            47,
+            54,
+            55
+          ],
+          [
+            70
+          ],
+          [
+            61,
+            62
+          ]
+        ]
       }
     },
-    "a28e16e4bc336d4406f9055639093dfe483c07d0": {
+    "a7e0738467b691f434f36f83969a8066bad5d144": {
       "StakingContract": {
         "0": [
           [],
@@ -289,7 +303,16 @@
         ]
       }
     },
-    "aad70bf609607ba1f5bf9ee4fe642657eea247b6": {
+    "b1d87fdab828bb1ab4ccdafeffbb1432925111ab": {
+      "MockV3Aggregator": {
+        "3": [
+          [
+            14
+          ],
+          [],
+          []
+        ]
+      },
       "ProjectToken": {
         "1": [
           [
@@ -317,6 +340,52 @@
           []
         ],
         "9": [
+          [],
+          [],
+          []
+        ]
+      },
+      "StakingContract": {
+        "8": [
+          [
+            7,
+            8,
+            9,
+            10,
+            44,
+            45,
+            47,
+            54,
+            55
+          ],
+          [
+            70
+          ],
+          [
+            61,
+            62,
+            70
+          ]
+        ]
+      }
+    },
+    "bc52b2cccf1096b85e7c8fe89e368a3161e4c2ca": {
+      "StakingContract": {
+        "0": [
+          [
+            48
+          ],
+          [
+            73
+          ],
+          []
+        ],
+        "4": [
+          [],
+          [],
+          []
+        ],
+        "8": [
           [],
           [],
           []
@@ -406,7 +475,26 @@
         ]
       }
     },
-    "c3b3b395ef414ebc929d9e0a64d8469666757806": {
+    "c279cc8943751138d83afc7624b797a544cdb1ba": {
+      "StakingContract": {
+        "0": [
+          [],
+          [],
+          []
+        ],
+        "4": [
+          [],
+          [],
+          []
+        ],
+        "8": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "c521b630fdd2c7dc8b57a46725ebddea47748f8f": {
       "StakingContract": {
         "0": [
           [],
@@ -418,75 +506,9 @@
             25
           ],
           [
-            65
+            66
           ],
           []
-        ]
-      }
-    },
-    "d1978866d3f26dd00d59f1b7377d0d994c99f945": {
-      "MockV3Aggregator": {
-        "3": [
-          [
-            14
-          ],
-          [],
-          []
-        ]
-      },
-      "ProjectToken": {
-        "1": [
-          [
-            8,
-            9,
-            22,
-            23,
-            24,
-            25,
-            26,
-            27
-          ],
-          [
-            28
-          ],
-          [
-            32,
-            33,
-            34
-          ]
-        ],
-        "6": [
-          [],
-          [],
-          []
-        ],
-        "9": [
-          [],
-          [],
-          []
-        ]
-      },
-      "StakingContract": {
-        "8": [
-          [
-            7,
-            8,
-            9,
-            10,
-            44,
-            45,
-            47,
-            53,
-            54
-          ],
-          [
-            69
-          ],
-          [
-            60,
-            61,
-            69
-          ]
         ]
       }
     },
@@ -596,26 +618,57 @@
         ]
       }
     },
-    "f04379cb73bbbf95d277171e023922f361c3fad7": {
-      "StakingContract": {
-        "0": [
+    "e713509e05721ab8cc6845eaae03cdc5750bcd2d": {
+      "ProjectToken": {
+        "1": [
+          [
+            17,
+            22,
+            23
+          ],
+          [
+            33
+          ],
+          [
+            32
+          ]
+        ],
+        "6": [
           [],
           [],
           []
         ],
-        "4": [
-          [],
-          [],
-          []
-        ],
-        "8": [
+        "9": [
           [],
           [],
           []
         ]
       }
     },
-    "f33e2c54a7c478dd4053c887496cb7e17f1a1d5b": {
+    "ed457cf05962dc57d69d7c24bf9411e6f4c00cfa": {
+      "ProjectToken": {
+        "1": [
+          [
+            14
+          ],
+          [
+            29
+          ],
+          []
+        ],
+        "6": [
+          [],
+          [],
+          []
+        ],
+        "9": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "ee7aaf26afa46a14bd30b05ad96ada723b20601c": {
       "StakingContract": {
         "0": [
           [],
@@ -624,18 +677,41 @@
         ],
         "8": [
           [
-            7,
-            8,
-            45,
-            46
+            7
           ],
           [
             61
           ],
+          []
+        ]
+      }
+    },
+    "f578234aca6605bb1ab33e6c9a9787f3f26aa410": {
+      "ProjectToken": {
+        "1": [
           [
-            60,
-            69
+            5,
+            18,
+            19
+          ],
+          [
+            31
+          ],
+          [
+            30
           ]
+        ],
+        "6": [
+          [
+            6
+          ],
+          [],
+          []
+        ],
+        "9": [
+          [],
+          [],
+          []
         ]
       }
     }

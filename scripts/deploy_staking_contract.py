@@ -4,12 +4,14 @@ from scripts.helpful_scripts import (
     get_contract,
     CENT,
     POINT_ONE,
+    ONE,
     get_verify_status,
     LOCAL_BLOCKCHAIN_ENVIRONMENTS,
 )
 from brownie import (
     ProjectToken,
     StakingContract,
+    AaveLending,
 )
 
 import yaml
@@ -145,21 +147,33 @@ def copy_folders_to_front_end(src, dest):
 
 
 def main():
-    # account = get_account()
-    # front_end_update = False
+    account = get_account()
+    # front_end_update = True
     # (
     #     staking_contract,
     #     project_token,
     #     weth_token,
     #     lending_protocol,
     # ) = deploy_staking_contract_and_project_token(front_end_update)
-    # weth_token_address = get_contract("weth_token")
-    # staking_contract = StakingContract[-1]
-    # stake_and_approve_token(
-    #     staking_contract, weth_token_address, POINT_ONE / 10, account
-    # )
+    # dai_token = get_contract("fau_token")
+    # pricefeed_of_token = {
+    #     dai_token: get_contract("dai_usd_price_feed"),
+    # }
+    # add_allowed_tokens(staking_contract, pricefeed_of_token, 20, account)
+    # pricefeed_of_token = {
+    #     project_token: get_contract("dai_usd_price_feed"),
+    # }
 
-    # unstake_token(staking_contract, weth_token_address, account)
+    # add_allowed_tokens(staking_contract, pricefeed_of_token, 0, account)
+    staking_contract = StakingContract[-1]
+    weth_token = get_contract("weth_token")
+    # staking_contract.updateYieldRate(weth_token, 15, {"from": account})
+    # pjtk = ProjectToken[-1]
+    # print(pjtk)
+    stake_and_approve_token(staking_contract, weth_token, POINT_ONE / 2, account)
 
-    # update_front_end()
-    pass
+    # aave_lending = AaveLending[-1]
+    # print(aave_lending.pool())
+    # print(staking_contract.tokenIsAllowed(pjtk))
+    # aave_lending.setStakingContract(staking_contract, {"from": account})
+    # print(aave_lending.stakingContract())
