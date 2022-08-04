@@ -9,6 +9,8 @@ Staking Dapp with front-end that allows users to stake various ERC20 tokens and 
 - Unit tests for every functions
 - Integrations test on Kovan testnet
 
+![Front-end](front_end/img/Screenshot5.png "Staking")
+
 
 ## TODO
 
