@@ -1,10 +1,11 @@
 import React, { useState } from "react"
 import { useEthers } from "@usedapp/core"
-import { TabContext, TabList, TabPanel } from "@material-ui/lab"
 import { ConnectionRequiredMsg } from "../ConnectionRequiredMsg"
-import { Tab, Box, makeStyles } from "@material-ui/core"
+import { Tab, Box, makeStyles, Grid } from "@material-ui/core"
 import { Token } from "../Main"
-import { Unstake } from "./Unstake"
+import { ClaimToken } from "./ClaimToken"
+import { TokenToClaim } from "./TokenToClaim"
+
 
 interface StakingContractProps {
     supportedTokens: Array<Token>
@@ -46,26 +47,11 @@ export const StakingContract = ({ supportedTokens, }: StakingContractProps) => {
             <Box className={classes.box}>
                 <div>
                     {isConnected ? (
-                        <TabContext value={selectedTokenIndex.toString()}>
-                            <TabList onChange={handleChange} aria-label="stake form tabs">
-                                {supportedTokens.map((token, index) => {
-                                    return (
-                                        <Tab
-                                            label={token.name}
-                                            value={index.toString()}
-                                            key={index}
-                                        />
-                                    )
-                                })}
-                            </TabList>
-                            {supportedTokens.map((token, index) => {
-                                return (
-                                    <TabPanel value={index.toString()} key={index}>
-                                        <Unstake token={token} />
-                                    </TabPanel>
-                                )
-                            })}
-                        </TabContext>
+                        <Grid>
+                            <TokenToClaim />
+                            <ClaimToken />
+                        </Grid>
+
                     ) : (
                         // <p>you need to connect</p>
                         <ConnectionRequiredMsg />

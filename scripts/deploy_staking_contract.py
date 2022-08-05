@@ -155,22 +155,15 @@ def main():
     #     weth_token,
     #     lending_protocol,
     # ) = deploy_staking_contract_and_project_token(front_end_update)
-    # dai_token = get_contract("fau_token")
-    # pricefeed_of_token = {
-    #     dai_token: get_contract("dai_usd_price_feed"),
-    # }
-    # add_allowed_tokens(staking_contract, pricefeed_of_token, 20, account)
-    # pricefeed_of_token = {
-    #     project_token: get_contract("dai_usd_price_feed"),
-    # }
+    dai_token = get_contract("fau_token")
+    pricefeed_of_token = {
+        dai_token: get_contract("dai_usd_price_feed"),
+    }
 
-    # add_allowed_tokens(staking_contract, pricefeed_of_token, 0, account)
+    add_allowed_tokens(staking_contract, pricefeed_of_token, 0, account)
     staking_contract = StakingContract[-1]
     weth_token = get_contract("weth_token")
-    # staking_contract.updateYieldRate(weth_token, 15, {"from": account})
-    # pjtk = ProjectToken[-1]
-    # print(pjtk)
-    stake_and_approve_token(staking_contract, weth_token, POINT_ONE / 2, account)
+    stake_and_approve_token(staking_contract, weth_token, POINT_ONE / 10, account)
 
     # aave_lending = AaveLending[-1]
     # print(aave_lending.pool())

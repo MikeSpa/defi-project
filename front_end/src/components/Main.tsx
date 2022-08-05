@@ -65,15 +65,16 @@ export const Main = () => {
             name: "DAI"
         },
         {
+            image: link,
+            address: LINKTokenAddress,
+            name: "LINK"
+        },
+        {
             image: eth2,
             address: cETHTokenAddress,
             name: "cETH"
         },
-        // {
-        //     image: link,
-        //     address: LINKTokenAddress,
-        //     name: "LINK"
-        // },
+
     ]
 
     const [showNetworkError, setShowNetworkError] = useState(false)

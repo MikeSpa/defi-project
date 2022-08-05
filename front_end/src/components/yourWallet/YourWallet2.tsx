@@ -8,7 +8,7 @@ import { ConnectionRequiredMsg } from "../ConnectionRequiredMsg"
 // import { useEthers } from "@usedapp/core"
 import { blockNumberReducer, useEthers } from "@usedapp/core"
 
-import { YieldRate } from "../stakingContract"
+import { YieldRate, Unstake } from "../stakingContract"
 
 import * as React from 'react';
 import { styled } from '@material-ui/core';
@@ -19,12 +19,12 @@ interface YourWalletProps {
 
 
 const useStyles = makeStyles((theme) => ({
-    tabContent: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: theme.spacing(4)
-    },
+    // tabContent: {
+    //     display: "flex",
+    //     flexDirection: "column",
+    //     alignItems: "center",
+    //     gap: theme.spacing(4)
+    // },
     box: {
         backgroundColor: "white",
         borderRadius: "25px"
@@ -87,7 +87,7 @@ export const YourWallet2 = ({ supportedTokens }: YourWalletProps) => {
     //     setSelectedTokenIndex(parseInt(newValue))
     // }
     return (
-        <Box>
+        <Box sx={{ width: '115%' }}>
             <h2 className={classes.header}>Your Wallet</h2>
             <Box className={classes.box}>
                 <div>
@@ -101,6 +101,7 @@ export const YourWallet2 = ({ supportedTokens }: YourWalletProps) => {
                                         <StyledTableCell align="center">Staked</StyledTableCell>
                                         <StyledTableCell align="center">APY</StyledTableCell>
                                         <StyledTableCell align="center">Stake more!</StyledTableCell>
+                                        <StyledTableCell align="center">Unstake</StyledTableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -115,6 +116,7 @@ export const YourWallet2 = ({ supportedTokens }: YourWalletProps) => {
                                             <TableCell align="center">{<StakingBalance token={token} />}</TableCell>
                                             <TableCell align="center">{<YieldRate token={token} />}</TableCell>
                                             <TableCell align="center">{<StakeForm token={token} />}</TableCell>
+                                            <TableCell align="center">{<Unstake token={token} />}</TableCell>
                                         </StyledTableRow>
                                     ))}
                                 </TableBody>
