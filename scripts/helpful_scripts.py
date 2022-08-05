@@ -90,6 +90,7 @@ contract_to_mock = {
     "aWETH": MockERC20,
     "DAI": MockDAI,
     "cDAI": MockERC20,
+    "LINK": MockERC20,
 }
 
 

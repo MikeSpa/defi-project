@@ -3,12 +3,13 @@ import helperConfig from "../helper-config.json"
 import networkMapping from "../chain-info/deployments/map.json"
 import { constants } from "ethers"
 import brownieConfig from "../brownie-config.json"
-import pjtk from "../pjtk.png"
-import eth from "../eth.png"
+import pjtk2 from "../pjtk2.png"
+import eth2 from "../eth2.svg"
 import dai from "../dai.png"
+import link from "../link.svg"
 import { YourWallet } from "./yourWallet/YourWallet"
 import { StakingContract } from "./stakingContract"
-import { Snackbar, Typography, makeStyles } from "@material-ui/core"
+import { Snackbar, Typography, makeStyles, Box } from "@material-ui/core"
 import React, { useEffect, useState } from "react"
 import Alert from "@material-ui/lab/Alert"
 
@@ -41,15 +42,17 @@ export const Main = () => {
     const dappTokenAddress: string = chainId ? networkMapping[String(chainId)]["ProjectToken"][0] : constants.AddressZero
     const wethTokenAddress: string = chainId ? brownieConfig["networks"][networkName]["weth_token"] : constants.AddressZero
     const daiTokenAddress: string = chainId ? brownieConfig["networks"][networkName]["fau_token"] : constants.AddressZero
+    const cETHTokenAddress: string = chainId ? brownieConfig["networks"][networkName]["cETH"] : constants.AddressZero //not supported in deployed contract on kovan
+    const LINKTokenAddress: string = chainId ? brownieConfig["networks"][networkName]["LINK"] : constants.AddressZero //not supported in deployed contract on kovan
 
     const supportedTokens: Array<Token> = [
         {
-            image: pjtk,//TODO add image
+            image: pjtk2,
             address: dappTokenAddress,
             name: "PJTK"
         },
         {
-            image: eth,
+            image: eth2,
             address: wethTokenAddress,
             name: "WETH"
         },
@@ -57,7 +60,18 @@ export const Main = () => {
             image: dai,
             address: daiTokenAddress,
             name: "DAI"
-        }
+        },
+        {
+            image: link,
+            address: LINKTokenAddress,
+            name: "LINK"
+        },
+        {
+            image: eth2,
+            address: cETHTokenAddress,
+            name: "cETH"
+        },
+
     ]
 
     const [showNetworkError, setShowNetworkError] = useState(false)
@@ -95,10 +109,14 @@ export const Main = () => {
                     root: classes.title,
                 }}
             >
-                Staking
+                Staking Contract
             </Typography>
-            <YourWallet supportedTokens={supportedTokens} />
             <StakingContract supportedTokens={supportedTokens} />
+            <YourWallet supportedTokens={supportedTokens} />
+            <Box>
+                <br></br>
+            </Box>
+
             <Snackbar
                 open={showNetworkError}
                 autoHideDuration={5000}

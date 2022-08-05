@@ -1,10 +1,11 @@
-import { useEthers, useLookupAddress } from "@usedapp/core"
+import { useEthers, useLookupAddress, useEtherBalance } from "@usedapp/core"
 import {
     Button,
     makeStyles,
     AppBar,
     Toolbar,
     Typography,
+    Grid,
 } from "@material-ui/core"
 
 const useStyles = makeStyles((theme) => ({
@@ -28,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 600,
         color: "#FFFEFE",
         textAlign: "center",
+        justifyContent: "center",
     },
 }))
 
@@ -37,11 +39,11 @@ const headersData = [
         href: "/staking",
     },
     {
-        label: "Your Funds",
+        label: "Funds",
         href: "/funds",
     },
     {
-        label: "Flash Loans",
+        label: "FlashLoans",
         href: "/flash-loan",
     },
     {
@@ -64,6 +66,7 @@ export const Header = () => {
     const classes = useStyles()
     const { account, activateBrowserWallet, deactivate } = useEthers()
     const ens = useLookupAddress()
+    console.log(ens)
     const isConnected = account !== undefined
 
     const displayDesktop = () => {
@@ -77,8 +80,8 @@ export const Header = () => {
     };
 
     const DeFiProjectLogo = (
-        <Typography variant="h6" component="h1" className={classes.logo}>
-            DeFi Project
+        <Typography variant="h6" component="h1" className={classes.logo} >
+            StakingContract
         </Typography>
     );
 
@@ -104,21 +107,24 @@ export const Header = () => {
     const getWallet = () => {
         return (
             // Account
-            <div className={classes.wallet}>
-                {ens || account}
-                {isConnected ?
-                    (<Button color="primary" variant="contained"
-                        onClick={deactivate}>
-                        Disconnect
+            <Grid container justify="flex-end">
+                <div className={classes.wallet} >
+                    {ens || account}
+                    {isConnected ?
+                        (<Button color="primary" variant="contained"
+                            onClick={deactivate}>
+                            Disconnect
 
-                    </Button>) :
-                    (<Button color="primary" variant="contained"
-                        onClick={() => activateBrowserWallet()}>
-                        Connect
-                    </Button>)
-                }
+                        </Button>) :
+                        (<Button color="primary" variant="contained"
+                            onClick={() => activateBrowserWallet()}>
+                            Connect
+                        </Button>)
+                    }
 
-            </div>
+                </div>
+            </Grid>
+
         )
     }
 
