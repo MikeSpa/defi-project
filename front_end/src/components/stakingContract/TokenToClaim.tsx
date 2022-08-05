@@ -2,7 +2,7 @@ import { Token } from "../Main"
 import { useEthers } from "@usedapp/core"
 import { constants } from "ethers"
 import { formatUnits } from "@ethersproject/units"
-import { BalanceMsg2 } from "../BalanceMsg2"
+import { BalanceMsg } from "../BalanceMsg"
 import { useTokenToClaim } from "../../hooks"
 
 
@@ -19,7 +19,7 @@ export const TokenToClaim = () => {
     // const formattedtokenToClaim = tokenToClaim
     const formattedtokenToClaim: number = tokenToClaim ? parseInt(formatUnits(tokenToClaim, 14)) / 10000 : 0
     console.log(formattedtokenToClaim)
-    return (<BalanceMsg2
+    return (<BalanceMsg
         label={'You currently have ' + formattedtokenToClaim + ' token available on the Staking Contract. Click the button below to claim them:'}
         amount={formattedtokenToClaim} />)
 }   

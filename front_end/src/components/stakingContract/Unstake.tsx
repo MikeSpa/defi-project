@@ -10,7 +10,7 @@ import { useUnstakeTokens, useStakingBalance } from "../../hooks"
 import Alert from "@material-ui/lab/Alert"
 import { useNotifications } from "@usedapp/core"
 import { formatUnits } from "@ethersproject/units"
-import { BalanceMsg2 } from "../../components"
+import { BalanceMsg } from "../../components"
 
 export interface UnstakeFormProps {
     token: Token
@@ -70,7 +70,7 @@ export const Unstake = ({ token }: UnstakeFormProps) => {
     return (
         <>
             <div className={classes.contentContainer}>
-                <BalanceMsg2
+                <BalanceMsg
                     label={''}
                     amount={formattedBalance}
                 />

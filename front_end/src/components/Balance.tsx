@@ -1,5 +1,4 @@
 import { Token } from "./Main"
-import { useEthers } from "@usedapp/core"
 import { formatUnits } from "@ethersproject/units"
 import { useStakingBalance } from "../hooks"
 

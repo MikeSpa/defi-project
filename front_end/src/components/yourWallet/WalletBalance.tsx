@@ -1,7 +1,7 @@
 import { Token } from "../Main"
 import { useEthers, useTokenBalance } from "@usedapp/core"
 import { formatUnits } from "@ethersproject/units"
-import { BalanceMsg2 } from "../BalanceMsg2"
+import { BalanceMsg } from "../BalanceMsg"
 import brownieConfig from "../../brownie-config.json"
 import helperConfig from "../../helper-config.json"
 
@@ -19,7 +19,7 @@ export const WalletBalance = ({ token }: WalletBalanceProps) => {
     const decimals = address === brownieConfig["networks"][networkName]["cETH"] ? 8 : 18
     const formattedTokenBalance = tokenBalance ? parseInt(formatUnits(tokenBalance, 0)) / 10 ** decimals : 0
     console.log(formattedTokenBalance)
-    return (<BalanceMsg2
+    return (<BalanceMsg
         label={formattedTokenBalance + ''}
         amount={formattedTokenBalance} />)
 }   

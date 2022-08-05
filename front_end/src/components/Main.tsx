@@ -7,7 +7,7 @@ import pjtk2 from "../pjtk2.png"
 import eth2 from "../eth2.svg"
 import dai from "../dai.png"
 import link from "../link.svg"
-import { YourWallet2 } from "./yourWallet/YourWallet2"
+import { YourWallet } from "./yourWallet/YourWallet"
 import { StakingContract } from "./stakingContract"
 import { Snackbar, Typography, makeStyles, Box } from "@material-ui/core"
 import React, { useEffect, useState } from "react"
@@ -112,7 +112,7 @@ export const Main = () => {
                 Staking Contract
             </Typography>
             <StakingContract supportedTokens={supportedTokens} />
-            <YourWallet2 supportedTokens={supportedTokens} />
+            <YourWallet supportedTokens={supportedTokens} />
             <Box>
                 <br></br>
             </Box>

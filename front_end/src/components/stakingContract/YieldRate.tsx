@@ -1,6 +1,6 @@
 import { Token } from "../Main"
 import { formatUnits } from "@ethersproject/units"
-import { BalanceMsg2 } from "../BalanceMsg2"
+import { BalanceMsg } from "../BalanceMsg"
 import { useYieldRate } from "../../hooks"
 
 
@@ -14,7 +14,7 @@ export const YieldRate = ({ token }: WalletBalanceProps) => {
     const yieldRate = useYieldRate(address)
     const formattedYieldRate = yieldRate ? parseInt(formatUnits(yieldRate, 0)) / 10 : 0
     console.log(formattedYieldRate)
-    return (<BalanceMsg2
+    return (<BalanceMsg
         label={formattedYieldRate + ' %'}
         amount={formattedYieldRate} />)
 }   

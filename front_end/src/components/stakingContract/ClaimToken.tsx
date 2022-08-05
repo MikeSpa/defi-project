@@ -9,7 +9,7 @@ import { Token } from "../Main"
 import { useClaimToken } from "../../hooks"
 import Alert from "@material-ui/lab/Alert"
 import { useNotifications } from "@usedapp/core"
-import { BalanceMsg2 } from ".."
+import { BalanceMsg } from ".."
 
 export interface UnstakeFormProps {
     token: Token
@@ -63,7 +63,7 @@ export const ClaimToken = () => {
     return (
         <>
             <div className={classes.contentContainer}>
-                <BalanceMsg2
+                <BalanceMsg
                     label={''}
                     amount={0}
                 />
