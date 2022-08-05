@@ -6,13 +6,9 @@ import brownieConfig from "../../brownie-config.json"
 import helperConfig from "../../helper-config.json"
 
 
-
-
 export interface WalletBalanceProps {
     token: Token
 }
-
-
 
 export const WalletBalance = ({ token }: WalletBalanceProps) => {
     const { image, address, name } = token

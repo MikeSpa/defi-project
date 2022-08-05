@@ -26,7 +26,6 @@ export const BalanceMsg2 = ({ label, amount }: BalanceMsgProps) => {
     return (
         <div className={classes.container}>
             <div>{label}</div>
-            {/* <div className={classes.amount}>{amount}</div> */}
         </div>
     )
 }

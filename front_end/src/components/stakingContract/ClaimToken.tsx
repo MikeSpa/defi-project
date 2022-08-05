@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import {
     Button,
     CircularProgress,
@@ -6,10 +6,9 @@ import {
     makeStyles,
 } from "@material-ui/core"
 import { Token } from "../Main"
-import { useUnstakeTokens, useStakingBalance, useClaimToken } from "../../hooks"
+import { useClaimToken } from "../../hooks"
 import Alert from "@material-ui/lab/Alert"
 import { useNotifications } from "@usedapp/core"
-// import { formatUnits } from "@ethersproject/units"
 import { BalanceMsg2 } from ".."
 
 export interface UnstakeFormProps {
@@ -27,7 +26,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const ClaimToken = () => {
-    // const { image, address: tokenAddress, name } = token
 
     const { notifications } = useNotifications()
 
@@ -68,7 +66,6 @@ export const ClaimToken = () => {
                 <BalanceMsg2
                     label={''}
                     amount={0}
-                // tokenImgSrc={image}
                 />
                 <Button
                     color="primary"

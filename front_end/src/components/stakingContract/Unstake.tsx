@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import {
     Button,
     CircularProgress,
@@ -73,7 +73,6 @@ export const Unstake = ({ token }: UnstakeFormProps) => {
                 <BalanceMsg2
                     label={''}
                     amount={formattedBalance}
-                // tokenImgSrc={image}
                 />
                 <Button
                     color="primary"

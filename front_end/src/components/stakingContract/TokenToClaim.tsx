@@ -1,5 +1,5 @@
 import { Token } from "../Main"
-import { useContractCall, useEthers } from "@usedapp/core"
+import { useEthers } from "@usedapp/core"
 import { constants } from "ethers"
 import { formatUnits } from "@ethersproject/units"
 import { BalanceMsg2 } from "../BalanceMsg2"

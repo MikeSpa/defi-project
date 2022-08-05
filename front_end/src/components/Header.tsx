@@ -1,4 +1,4 @@
-import { useEthers, useLookupAddress } from "@usedapp/core"
+import { useEthers, useLookupAddress, useEtherBalance } from "@usedapp/core"
 import {
     Button,
     makeStyles,

@@ -1,16 +1,13 @@
 import { Token } from "../Main"
 import { Box, Table, TableBody, TableHead, TableRow, Paper, TableCell, TableContainer, makeStyles } from "@material-ui/core"
-// import React, { useState } from "react"
 import { WalletBalance } from "./WalletBalance"
 import { StakingBalance } from "./StakingBalance"
 import { StakeForm } from "./StakeForm"
 import { ConnectionRequiredMsg } from "../ConnectionRequiredMsg"
-// import { useEthers } from "@usedapp/core"
-import { blockNumberReducer, useEthers } from "@usedapp/core"
+import { useEthers } from "@usedapp/core"
 
 import { YieldRate, Unstake } from "../stakingContract"
 
-import * as React from 'react';
 import { styled } from '@material-ui/core';
 
 interface YourWalletProps {
@@ -19,12 +16,6 @@ interface YourWalletProps {
 
 
 const useStyles = makeStyles((theme) => ({
-    // tabContent: {
-    //     display: "flex",
-    //     flexDirection: "column",
-    //     alignItems: "center",
-    //     gap: theme.spacing(4)
-    // },
     box: {
         backgroundColor: "white",
         borderRadius: "25px"
@@ -38,11 +29,6 @@ const useStyles = makeStyles((theme) => ({
     tokenName: {
         alignContent: "middle",
     },
-    // tokenNameImg: {
-    //     display: "flex",
-    //     // align- items: "center",
-    //     // flex- direction= "row",
-    // }
 }))
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -74,21 +60,9 @@ export const YourWallet2 = ({ supportedTokens }: YourWalletProps) => {
 
     const classes = useStyles()
 
-    // const { image, address: tokenAddress, name } = token
-    // const balance = useStakingBalance(tokenAddress)
-
-    // const formattedBalance: number = balance
-    //     ? parseFloat(formatUnits(balance, 18))
-    //     : 0
-
-    // const [selectedTokenIndex, setSelectedTokenIndex] = useState<number>(0)
-
-    // const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
-    //     setSelectedTokenIndex(parseInt(newValue))
-    // }
     return (
         <Box sx={{ width: '115%' }}>
-            <h2 className={classes.header}>Your Wallet</h2>
+            <h2 className={classes.header}>Your Assets</h2>
             <Box className={classes.box}>
                 <div>
                     {isConnected ? (

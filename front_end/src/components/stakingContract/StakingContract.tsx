@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { useEthers } from "@usedapp/core"
 import { ConnectionRequiredMsg } from "../ConnectionRequiredMsg"
-import { Tab, Box, makeStyles, Grid } from "@material-ui/core"
+import { Box, makeStyles, Grid } from "@material-ui/core"
 import { Token } from "../Main"
 import { ClaimToken } from "./ClaimToken"
 import { TokenToClaim } from "./TokenToClaim"
@@ -43,7 +43,7 @@ export const StakingContract = ({ supportedTokens, }: StakingContractProps) => {
 
     return (
         <Box>
-            <h2 className={classes.header}>The Stacking Contract</h2>
+            <h2 className={classes.header}>Claim Your Tokens</h2>
             <Box className={classes.box}>
                 <div>
                     {isConnected ? (

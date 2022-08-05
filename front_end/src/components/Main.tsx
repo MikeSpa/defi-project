@@ -3,16 +3,13 @@ import helperConfig from "../helper-config.json"
 import networkMapping from "../chain-info/deployments/map.json"
 import { constants } from "ethers"
 import brownieConfig from "../brownie-config.json"
-import pjtk from "../pjtk.png"
 import pjtk2 from "../pjtk2.png"
-import eth from "../eth.png"
 import eth2 from "../eth2.svg"
 import dai from "../dai.png"
 import link from "../link.svg"
-import { YourWallet } from "./yourWallet/YourWallet"
 import { YourWallet2 } from "./yourWallet/YourWallet2"
 import { StakingContract } from "./stakingContract"
-import { Snackbar, Typography, makeStyles } from "@material-ui/core"
+import { Snackbar, Typography, makeStyles, Box } from "@material-ui/core"
 import React, { useEffect, useState } from "react"
 import Alert from "@material-ui/lab/Alert"
 
@@ -112,11 +109,14 @@ export const Main = () => {
                     root: classes.title,
                 }}
             >
-                Staking
+                Staking Contract
             </Typography>
-            {/* <YourWallet supportedTokens={supportedTokens} /> */}
-            <YourWallet2 supportedTokens={supportedTokens} />
             <StakingContract supportedTokens={supportedTokens} />
+            <YourWallet2 supportedTokens={supportedTokens} />
+            <Box>
+                <br></br>
+            </Box>
+
             <Snackbar
                 open={showNetworkError}
                 autoHideDuration={5000}

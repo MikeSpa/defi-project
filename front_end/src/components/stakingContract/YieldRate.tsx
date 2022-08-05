@@ -11,9 +11,7 @@ export interface WalletBalanceProps {
 
 export const YieldRate = ({ token }: WalletBalanceProps) => {
     const { address } = token
-    // const { account } = useEthers()
     const yieldRate = useYieldRate(address)
-    // const formattedYieldRate = yieldRate
     const formattedYieldRate = yieldRate ? parseInt(formatUnits(yieldRate, 0)) / 10 : 0
     console.log(formattedYieldRate)
     return (<BalanceMsg2
