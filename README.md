@@ -9,18 +9,13 @@ Staking Dapp with front-end that allows users to stake various ERC20 tokens and 
 - Unit tests for every functions
 - Integrations test on Kovan testnet
 
-![Front-end](front_end/img/Screenshot5.png "Staking")
+![Front-end](front_end/img/Screenshot1.png "Assets - Staking - Claim Yield")
 
 
 ## TODO
 
-- [x] Add Events
-- [x] Implement moving asset from comp to aave 
-- [ ] Move front end into diff repo
 - [ ] Remove contracts not related to StakingContract: flashloan stuff, uniswap, ...
-- [x] refactoring of deploy_staking_contract
 - [ ] get second account and differentiate between deployer and user in integratioins tests
-- [x] extensively tests claimToken
 - [ ] rewrite integration test for new implementation
 - [ ] add nicer interface for front-end: graphs with token staked, yield earned, ...
 
